@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Productvity Tracker</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_productive_graph">ProductiveGraphActivity</string>
+    <string name="title_activity_graph">GraphActivity</string>
+    <string name="title_activity_home">HomeActivity</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_main_navigation">MainNavigationActivity</string>
+</resources>
