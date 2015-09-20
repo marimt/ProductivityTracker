@@ -2,26 +2,48 @@ package org.example.productivity.productvitytracker;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity{
+import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
+import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
+import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 
+
+public class MainActivity extends AppCompatActivity {
+
+    FragmentManager manager = getFragmentManager();
+    Toolbar toolbar;
     private static final String LOG_TAG = "TestInput";
     public static boolean isProductive;     //TODO change this so somehow status is set with button click, global is not ideal
-    FragmentManager manager = getFragmentManager();
-
-    //TODO put all buttons and such in a fragment so the main activity itself is essetially blank except for the fragments that woll be added/removed
 
     //Needed UI components
     EditText hours, minutes, month, day, year, activityType;
-    Button newUnprodActBtn, newProdActBtn, openGraph, openNavigation;
+    //Button newUnprodActBtn, newProdActBtn, openGraph, openNavigation;
+
+    //=========================================================================================================================================
+    //=========================================================================================================================================
+
+    //TODO remove and update buttons since some are depreciated. still need graph buttons but not in main, do in frag...look at sketches but for now just setting up original way
+    /**
+     * ^^^^ is goal for next time.
+     * 1) add welcome default frag
+     * 2) break up main nav frag into two frags, one for add activity & 1 for view history.
+     * 3) Link those NAV LAYOUTS to sub FAB bttn (currently set directly to addmodfrag)
+     * 4) link nav layouts to proper sub layouts
+     * 5) set up next goal which is probably customizing the graph
+     */
+    //=========================================================================================================================================
+    //=========================================================================================================================================
+
+
 
 
     @Override
@@ -29,69 +51,87 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Associate EditText fields and Button with layout
+
+        //Associate fields with layout
         hours = (EditText) findViewById(R.id.editDurationHours);
         minutes = (EditText) findViewById(R.id.editDurationMin);
         month = (EditText) findViewById(R.id.editMonth);
         day = (EditText) findViewById(R.id.editDay);
         year = (EditText) findViewById(R.id.editYear);
         activityType = (EditText) findViewById(R.id.editActivityType);
-        newProdActBtn =  (Button) findViewById(R.id.addProductiveBtn);
-        newUnprodActBtn =  (Button) findViewById(R.id.addUnproductiveBtn);
-        openGraph =  (Button) findViewById(R.id.GraphBtn);
+
+       /* newProdActBtn = (Button) findViewById(R.id.addProductiveBtn);
+        newUnprodActBtn = (Button) findViewById(R.id.addUnproductiveBtn);
+        openGraph = (Button) findViewById(R.id.GraphBtn);
         openNavigation = (Button) findViewById(R.id.NavTestBtn);
+        */
+        //TODO fix the toolbar...looks bad without it but need to fix fragments first
+        //toolbar = (Toolbar) findViewById(R.id.toolbar);
 
 
+        //Makes ImageViews for icons
+        ImageView addTimeModFAB = new ImageView(this);
+        ImageView addProdFAB = new ImageView(this);
+        ImageView addUNprodFAB = new ImageView(this);
+
+        //TODO get actual icons for these
+        addTimeModFAB.setImageResource(R.drawable.circle);
+        addProdFAB.setImageResource(R.drawable.circle);
+        addUNprodFAB.setImageResource(R.drawable.circle);
+
+        //Make main floating action bar button (FAB button)
+        FloatingActionButton floatingActionButton = new FloatingActionButton.Builder(this).setContentView(addTimeModFAB).build();
+
+        //Add SubAction that opens submenu which displays FAB sub-buttons after clicking addTimeModFAB
+        SubActionButton.Builder itemBuilder = new SubActionButton.Builder(this);
+
+        //Create and add sub-buttons to submenu
+        SubActionButton buttonProdActivity = itemBuilder.setContentView(addProdFAB).build();
+        SubActionButton buttonUNprodActivity = itemBuilder.setContentView(addUNprodFAB).build();
+
+        //Create submenu for FAB sub-buttons
+        FloatingActionMenu actionMenu = new FloatingActionMenu.Builder(this)
+                .addSubActionView(buttonProdActivity)   //sub-button
+                .addSubActionView(buttonUNprodActivity) //sub-button
+                .attachTo(floatingActionButton) //main button
+                .build();
+                //TODO the sub buttons don't close when user presses one. fix that.
+
+        //Set listeners for FAB sub-buttons
         //TODO Make code more elegant, I know remaking OnClickListener is not ideal, maybe do same thing switch case in fragments?
-        newProdActBtn.setOnClickListener(new View.OnClickListener() {
+        buttonProdActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Link AddModuleFragment
-                isProductive = true;   //set global productivity status as productive each time productive button is clicked
+                isProductive = true;   //set global productivity status as true so it's added into productive ArrayList
+
+                MainNavigationFragment mainNavFrag = new MainNavigationFragment();
                 AddModuleFragment addModFrag = new AddModuleFragment();
                 FragmentTransaction transaction = manager.beginTransaction();
-                //TODO replace the fragment so it does not overlay
-                transaction.add((R.id.main_act), addModFrag, "AddProdModFragID");
+                //TODO replace the fragment so it does not overlay when switching adding
+                transaction.add((R.id.main_act), mainNavFrag, "AddProdModFragID");
                 transaction.commit();
+
             }
         });
 
-        newUnprodActBtn.setOnClickListener(new View.OnClickListener() {
+        buttonUNprodActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Link AddModuleFragment
-                isProductive = false;   //set global productivity status as productive each time unproductive button is clicked
-                AddModuleFragment addModFrag = new AddModuleFragment();
-                FragmentTransaction transaction = manager.beginTransaction();
-                //TODO replace the fragment so it does not overlay
-                transaction.add((R.id.main_act), addModFrag, "AddUnprodModFragID");
-                transaction.commit();
+                isProductive = false;   //set global productivity status as false so it's added into UNproductive ArrayList
+
+                Toast.makeText(getApplicationContext(), "omg what now",
+                        Toast.LENGTH_SHORT).show();
+
             }
         });
 
-        openGraph.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //create an object of intent class to help us open second activity
-                Intent intent = new Intent("org.example.productivity.productvitytracker.GraphActivity"); //this is the package of the new activity
-                startActivity(intent);
-            }
-        });
-
-        openGraph.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //create an object of intent class to help us open second activity
-                Intent intent = new Intent("org.example.productivity.productvitytracker.MainNavigationActivity"); //this is the package of the new activity
-                startActivity(intent);
-            }
-        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main_navigation, menu);
         return true;
     }
 

@@ -6,51 +6,15 @@
     android:layout_marginTop="10dp"
     android:id="@+id/main_act">
 
+    <!--
+        activity_main layout is blank since actions are now controlled by floating action
+        button which is implemented in MainActivity.java
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="What type of activity are you adding?"
-        android:id="@+id/textView"
-        android:layout_above="@+id/addProductiveBtn"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="55dp" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Productive"
-        android:id="@+id/addProductiveBtn"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Unproductive"
-        android:id="@+id/addUnproductiveBtn"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="143dp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="View Graph"
-        android:id="@+id/GraphBtn"
-        android:layout_alignTop="@+id/addUnproductiveBtn"
-        android:layout_alignLeft="@+id/addProductiveBtn"
-        android:layout_alignStart="@+id/addProductiveBtn"
-        android:layout_marginTop="66dp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Navigation Test"
-        android:id="@+id/NavTestBtn"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/GraphBtn"
-        android:layout_alignEnd="@+id/GraphBtn" />
+        TODO I want to have a simple text layout here saying welcome or something but don't implement that yet
+            for the above you could do an introductory fragment that is on the blank screen by default then switch it
+            out when user tries to add new activity or view history
+    -->
 
 </RelativeLayout>
