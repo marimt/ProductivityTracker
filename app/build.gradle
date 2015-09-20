@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "org.example.productivity.productvitytracker"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -24,4 +24,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.android.support:support-v4:22.2.1'
     compile 'com.google.android.gms:play-services:4.2.42'
+    compile 'com.oguzdev:CircularFloatingActionMenu:1.0.2'
 }
