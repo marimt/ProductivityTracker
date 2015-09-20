@@ -4,10 +4,6 @@
 
 * Android application that tracks a user's productive and unproductive time. Displays information in graphical format. 
 
-### How do I get set up? ###
-
-* Dependencies
-
 
 ### External resources ###
 
