@@ -6,4 +6,5 @@
     android:elevation="2dp"
     android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
     android:background="@color/ColorPrimary"
-    xmlns:android="http://schemas.android.com/apk/res/android" />
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toolbar"/>

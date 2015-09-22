@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/viewHistoryNavFrag">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="100dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View your history"
+            android:id="@+id/viewHistoryText"
+            android:layout_marginBottom="10dp"/>
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnCount="2"
+            android:rowCount="2">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Productive"
+                android:id="@+id/prodViewHistoryBtn"
+                android:layout_row="1"
+                android:layout_column="0"
+                android:layout_marginRight="5dp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unproductive"
+                android:id="@+id/UNprodViewHistoryBtn"
+                android:layout_row="1"
+                android:layout_column="1"
+                android:layout_marginLeft="5dp"/>
+        </GridLayout>
+    </LinearLayout>
+</RelativeLayout>

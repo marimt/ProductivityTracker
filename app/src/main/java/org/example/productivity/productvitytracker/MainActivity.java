@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
@@ -22,23 +21,22 @@ public class MainActivity extends AppCompatActivity {
     FragmentManager manager = getFragmentManager();
     Toolbar toolbar;
     private static final String LOG_TAG = "TestInput";
-    public static boolean isProductive;     //TODO change this so somehow status is set with button click, global is not ideal
+    public static boolean isProductive;
 
     //Needed UI components
     EditText hours, minutes, month, day, year, activityType;
-    //Button newUnprodActBtn, newProdActBtn, openGraph, openNavigation;
 
     //=========================================================================================================================================
     //=========================================================================================================================================
-
-    //TODO remove and update buttons since some are depreciated. still need graph buttons but not in main, do in frag...look at sketches but for now just setting up original way
     /**
      * ^^^^ is goal for next time.
-     * 1) add welcome default frag
-     * 2) break up main nav frag into two frags, one for add activity & 1 for view history.
-     * 3) Link those NAV LAYOUTS to sub FAB bttn (currently set directly to addmodfrag)
-     * 4) link nav layouts to proper sub layouts
-     * 5) set up next goal which is probably customizing the graph
+     * 3b) Set up onClickListeners for view and add NAVIGATION framents
+     * 4) link nav layouts to proper sub layouts, add to addMod and view to GraphActivity
+     * 5) set up next goals which is probably customizing the graph
+     * 6) storage
+     * 7) prettify
+     * 9) fix bugs in to dos
+     * 8) test and port out yo
      */
     //=========================================================================================================================================
     //=========================================================================================================================================
@@ -60,72 +58,91 @@ public class MainActivity extends AppCompatActivity {
         year = (EditText) findViewById(R.id.editYear);
         activityType = (EditText) findViewById(R.id.editActivityType);
 
-       /* newProdActBtn = (Button) findViewById(R.id.addProductiveBtn);
-        newUnprodActBtn = (Button) findViewById(R.id.addUnproductiveBtn);
-        openGraph = (Button) findViewById(R.id.GraphBtn);
-        openNavigation = (Button) findViewById(R.id.NavTestBtn);
-        */
         //TODO fix the toolbar...looks bad without it but need to fix fragments first
-        //toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+
+        //Add default welcome layout. Will be switched for other layouts (add activity, history) depending on user behavior
+        final WelcomeScreenFragment welcomeScreen = new WelcomeScreenFragment();
+        FragmentTransaction transaction2 = manager.beginTransaction();
+        transaction2.add((R.id.main_act), welcomeScreen, "defaultWelcomeScrn");
+        transaction2.commit();
 
 
         //Makes ImageViews for icons
-        ImageView addTimeModFAB = new ImageView(this);
-        ImageView addProdFAB = new ImageView(this);
-        ImageView addUNprodFAB = new ImageView(this);
+        ImageView mainNavFAB = new ImageView(this);
+        ImageView addActFAB = new ImageView(this);
+        ImageView viewHistoryFAB = new ImageView(this);
 
         //TODO get actual icons for these
-        addTimeModFAB.setImageResource(R.drawable.circle);
-        addProdFAB.setImageResource(R.drawable.circle);
-        addUNprodFAB.setImageResource(R.drawable.circle);
+        //Assign icons for FAB buttons
+        mainNavFAB.setImageResource(R.drawable.circle);
+        addActFAB.setImageResource(R.drawable.circle);
+        viewHistoryFAB.setImageResource(R.drawable.circle);
 
         //Make main floating action bar button (FAB button)
-        FloatingActionButton floatingActionButton = new FloatingActionButton.Builder(this).setContentView(addTimeModFAB).build();
+        FloatingActionButton floatingActionButton = new FloatingActionButton.Builder(this).setContentView(mainNavFAB).build();
 
-        //Add SubAction that opens submenu which displays FAB sub-buttons after clicking addTimeModFAB
+        //Add SubAction that opens submenu which displays FAB sub-buttons after clicking mainNavFAB
         SubActionButton.Builder itemBuilder = new SubActionButton.Builder(this);
 
         //Create and add sub-buttons to submenu
-        SubActionButton buttonProdActivity = itemBuilder.setContentView(addProdFAB).build();
-        SubActionButton buttonUNprodActivity = itemBuilder.setContentView(addUNprodFAB).build();
+        SubActionButton buttonAddActivity = itemBuilder.setContentView(addActFAB).build();
+        SubActionButton buttonViewHistory = itemBuilder.setContentView(viewHistoryFAB).build();
 
         //Create submenu for FAB sub-buttons
         FloatingActionMenu actionMenu = new FloatingActionMenu.Builder(this)
-                .addSubActionView(buttonProdActivity)   //sub-button
-                .addSubActionView(buttonUNprodActivity) //sub-button
+                .addSubActionView(buttonAddActivity)   //sub-button
+                .addSubActionView(buttonViewHistory) //sub-button
                 .attachTo(floatingActionButton) //main button
                 .build();
                 //TODO the sub buttons don't close when user presses one. fix that.
 
         //Set listeners for FAB sub-buttons
-        //TODO Make code more elegant, I know remaking OnClickListener is not ideal, maybe do same thing switch case in fragments?
-        buttonProdActivity.setOnClickListener(new View.OnClickListener() {
+        buttonAddActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Link AddModuleFragment
+                //Link AddActivityNavigationFragment
+
+                AddActivityNavigationFragment addActivityNavigationFragment = new AddActivityNavigationFragment();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.remove(welcomeScreen);
+                //TODO figure out how to check if addNav is open since right now if it's open it will overlay...
+                transaction.add((R.id.main_act), addActivityNavigationFragment, "addActNav");
+                transaction.commit();
+
+
+                //below is format for adding an activity. pretty much just note setting isProductive boolean and that there is a function for it at bottom @isProductive()
+                //oh and the global variable
+                /*
+                //Link AddModuleNavigationFragment
                 isProductive = true;   //set global productivity status as true so it's added into productive ArrayList
 
-                MainNavigationFragment mainNavFrag = new MainNavigationFragment();
                 AddModuleFragment addModFrag = new AddModuleFragment();
                 FragmentTransaction transaction = manager.beginTransaction();
                 //TODO replace the fragment so it does not overlay when switching adding
                 transaction.add((R.id.main_act), mainNavFrag, "AddProdModFragID");
                 transaction.commit();
+               */
 
             }
         });
 
-        buttonUNprodActivity.setOnClickListener(new View.OnClickListener() {
+        buttonViewHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isProductive = false;   //set global productivity status as false so it's added into UNproductive ArrayList
+                //Link ViewHistoryNavigationFragment
 
-                Toast.makeText(getApplicationContext(), "omg what now",
-                        Toast.LENGTH_SHORT).show();
-
+                ViewHistoryNavigationFragment viewHistoryNavigationFragment = new ViewHistoryNavigationFragment();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.remove(welcomeScreen);
+                //TODO figure out how to check if addNav is open since right now if it's open it will overlay...
+                transaction.add((R.id.main_act), viewHistoryNavigationFragment, "viewHistNav");
+                transaction.commit();
             }
         });
 
+        //TODO fix the overall navigation. right now back button exits out of the whole app...should go to previous state...
     }
 
     @Override
