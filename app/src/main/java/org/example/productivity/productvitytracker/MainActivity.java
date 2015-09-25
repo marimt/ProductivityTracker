@@ -10,18 +10,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
 import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     FragmentManager manager = getFragmentManager();
     Toolbar toolbar;
     private static final String LOG_TAG = "TestInput";
     public static boolean isProductive;
+
+    View view;  //create view as global to set up onClickListener switch cases
 
     //Needed UI components
     EditText hours, minutes, month, day, year, activityType;
@@ -87,8 +90,8 @@ public class MainActivity extends AppCompatActivity {
         SubActionButton.Builder itemBuilder = new SubActionButton.Builder(this);
 
         //Create and add sub-buttons to submenu
-        SubActionButton buttonAddActivity = itemBuilder.setContentView(addActFAB).build();
-        SubActionButton buttonViewHistory = itemBuilder.setContentView(viewHistoryFAB).build();
+        final SubActionButton buttonAddActivity = itemBuilder.setContentView(addActFAB).build();
+        final SubActionButton buttonViewHistory = itemBuilder.setContentView(viewHistoryFAB).build();
 
         //Create submenu for FAB sub-buttons
         FloatingActionMenu actionMenu = new FloatingActionMenu.Builder(this)
@@ -96,51 +99,97 @@ public class MainActivity extends AppCompatActivity {
                 .addSubActionView(buttonViewHistory) //sub-button
                 .attachTo(floatingActionButton) //main button
                 .build();
-                //TODO the sub buttons don't close when user presses one. fix that.
+        //TODO the sub buttons don't close when user presses one. fix that.
 
         //Set listeners for FAB sub-buttons
+        //--------buttonAddActivuty FAB sub-button------------------------------------------------------------
         buttonAddActivity.setOnClickListener(new View.OnClickListener() {
+
+            FragmentTransaction transaction = manager.beginTransaction();   //transaction for first time button is pressed
+            FragmentTransaction transactionChange = manager.beginTransaction();     //transaction for case if buttonViewHistory is pressed on AddActivity fragment
+            FragmentTransaction transactionChange2 = manager.beginTransaction();     //transaction for case if buttonViewHistory is pressed on AddActivity fragment
+            AddActivityNavigationFragment addActivityNavigationFragment = new AddActivityNavigationFragment();
+            ViewHistoryNavigationFragment viewHist = new ViewHistoryNavigationFragment();
+
             @Override
             public void onClick(View v) {
-                //Link AddActivityNavigationFragment
+                //CASE 1 of buttonAddActivity button press - it has not been pressed before.
+                //Show AddActivityNavigationFragment
+                if (welcomeScreen.isVisible()) {   //setting the fragments only to be replaced under this condition stops it from mult overlay since add its only on startup
+                    transaction.replace(R.id.main_act, addActivityNavigationFragment);  //use replace to prevent multiple overlay
+                    transaction.commit();
+                }
 
-                AddActivityNavigationFragment addActivityNavigationFragment = new AddActivityNavigationFragment();
-                FragmentTransaction transaction = manager.beginTransaction();
-                transaction.remove(welcomeScreen);
-                //TODO figure out how to check if addNav is open since right now if it's open it will overlay...
-                transaction.add((R.id.main_act), addActivityNavigationFragment, "addActNav");
-                transaction.commit();
+                //CASE 2 of buttonAddActivity button pressed while addActNav fragment is already up
+                if (v == buttonAddActivity && addActivityNavigationFragment.isVisible()) {
+                    Toast.makeText(getApplicationContext(), "Please finish adding the current activity", Toast.LENGTH_SHORT).show();
+                }
 
-
-                //below is format for adding an activity. pretty much just note setting isProductive boolean and that there is a function for it at bottom @isProductive()
-                //oh and the global variable
-                /*
-                //Link AddModuleNavigationFragment
-                isProductive = true;   //set global productivity status as true so it's added into productive ArrayList
-
-                AddModuleFragment addModFrag = new AddModuleFragment();
-                FragmentTransaction transaction = manager.beginTransaction();
-                //TODO replace the fragment so it does not overlay when switching adding
-                transaction.add((R.id.main_act), mainNavFrag, "AddProdModFragID");
-                transaction.commit();
-               */
+                //CASE 3 - buttonViewHistory is pressed while addActNav is up
+                buttonViewHistory.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v2) {
+                        if (addActivityNavigationFragment.isVisible()) {
+                            transactionChange.replace(R.id.main_act, viewHist);
+                            transactionChange.commit();
+                        }
+                        //TODO add case for if add activity is pressed after switching to viewHist
+                    }
+                });
 
             }
         });
+        //--------------------------------------------------------------------------------end buttonAddActivuty FAB sub-button----
 
+        //--------buttonViewHistory FAB sub-button------------------------------------------------------------
         buttonViewHistory.setOnClickListener(new View.OnClickListener() {
+            FragmentTransaction transaction = manager.beginTransaction();   //transaction for first time button is pressed
+            FragmentTransaction transactionChange = manager.beginTransaction();     //transaction for case if buttonViewHistory is pressed on AddActivity fragment
+            AddActivityNavigationFragment addActivityNavigationFragment = new AddActivityNavigationFragment();
+            ViewHistoryNavigationFragment viewHist = new ViewHistoryNavigationFragment();
+
             @Override
             public void onClick(View v) {
-                //Link ViewHistoryNavigationFragment
+                //CASE 1 of buttonViewHistory button press - it has not been pressed before.
+                //Show ViewHistoryNavigationFragment
+                if (welcomeScreen.isVisible()) {   //setting the fragments only to be replaced under this condition stops it from mult overlay since add its only on startup
+                    transaction.replace(R.id.main_act, viewHist);  //use replace to prevent multiple overlay
+                    transaction.commit();
+                }
 
-                ViewHistoryNavigationFragment viewHistoryNavigationFragment = new ViewHistoryNavigationFragment();
-                FragmentTransaction transaction = manager.beginTransaction();
-                transaction.remove(welcomeScreen);
-                //TODO figure out how to check if addNav is open since right now if it's open it will overlay...
-                transaction.add((R.id.main_act), viewHistoryNavigationFragment, "viewHistNav");
-                transaction.commit();
+
+
+                //CASE 3 - buttonAddActivity is pressed while viewHist is up
+                buttonAddActivity.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v2) {
+                        if (viewHist.isVisible()) {
+                            transactionChange.replace(R.id.main_act, addActivityNavigationFragment);
+                            transactionChange.commit();
+                        }
+                        // SIDE CASE - if addActNav button pressed while addActNav fragment is already up
+                        if (v2 == buttonAddActivity && addActivityNavigationFragment.isVisible()) {
+                                Toast.makeText(getApplicationContext(), "Please finish adding the current activity", Toast.LENGTH_SHORT).show();
+                        }
+                        //TODO add case for if viewhist is pressed after switching to addactivity
+                    }
+                });
+
             }
         });
+        //TODO EXTRA: this FAB button code for cases is redundant...ideally  would want to make a class for it...or do a case-switch by implementing  onclicklistener
+        //--------------------------------------------------------------------------------end buttonViewActivity FAB sub-button----
+
+            //below is format for adding an activity. pretty much just note setting isProductive boolean and that there is a function for it at bottom @isProductive()
+            //oh and the global variable
+            /*
+            //Link AddModuleNavigationFragment
+            isProductive=true;   //set global productivity status as true so it's added into productive ArrayList
+
+            AddModuleFragment addModFrag = new AddModuleFragment();
+            FragmentTransaction transaction = manager.beginTransaction();
+            transaction.add((R.id.main_act),mainNavFrag,"AddProdModFragID");
+            transaction.commit();
+            */
+
 
         //TODO fix the overall navigation. right now back button exits out of the whole app...should go to previous state...
     }
