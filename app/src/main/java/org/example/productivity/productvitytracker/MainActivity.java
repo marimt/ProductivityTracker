@@ -21,21 +21,17 @@ public class MainActivity extends AppCompatActivity{
 
     FragmentManager manager = getFragmentManager();
     Toolbar toolbar;
-    private static final String LOG_TAG = "TestInput";
-    public static boolean isProductive;
-
-    View view;  //create view as global to set up onClickListener switch cases
 
     //Needed UI components
-    EditText hours, minutes, month, day, year, activityType;
+    EditText hours, minutes, month, day, year, activityType;    //for AddModuleFragment
 
     //=========================================================================================================================================
     //=========================================================================================================================================
     /**
-     * ^^^^ is goal for next time.
-     * 3b) Set up onClickListeners for view and add NAVIGATION framents
-     * 4) link nav layouts to proper sub layouts, add to addMod and view to GraphActivity
-     * 5) set up next goals which is probably customizing the graph
+     * 5) customize GraphActivity
+     * 5a) differentiate between viewing a prod and UNprod graphActivity
+     * 5c) update viewNavFrag onClickListeners for differentiation
+     * 5d) set up sub goals for storage
      * 6) storage
      * 7) prettify
      * 9) fix bugs in to dos
@@ -61,7 +57,7 @@ public class MainActivity extends AppCompatActivity{
         year = (EditText) findViewById(R.id.editYear);
         activityType = (EditText) findViewById(R.id.editActivityType);
 
-        //TODO fix the toolbar...looks bad without it but need to fix fragments first
+        //TODO fix the toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
 
@@ -101,14 +97,17 @@ public class MainActivity extends AppCompatActivity{
                 .build();
         //TODO the sub buttons don't close when user presses one. fix that.
 
+        final AddActivityNavigationFragment addActivityNavigationFragment = new AddActivityNavigationFragment();
         //Set listeners for FAB sub-buttons
-        //--------buttonAddActivuty FAB sub-button------------------------------------------------------------
+        //--------buttonAddActivity FAB sub-button------------------------------------------------------------
         buttonAddActivity.setOnClickListener(new View.OnClickListener() {
 
-            FragmentTransaction transaction = manager.beginTransaction();   //transaction for first time button is pressed
-            FragmentTransaction transactionChange = manager.beginTransaction();     //transaction for case if buttonViewHistory is pressed on AddActivity fragment
-            FragmentTransaction transactionChange2 = manager.beginTransaction();     //transaction for case if buttonViewHistory is pressed on AddActivity fragment
-            AddActivityNavigationFragment addActivityNavigationFragment = new AddActivityNavigationFragment();
+            FragmentTransaction transaction = manager.beginTransaction();
+            FragmentTransaction transactionChange = manager.beginTransaction();
+            FragmentTransaction transactionChangeBack = manager.beginTransaction();
+            FragmentTransaction transactionChange2 = manager.beginTransaction();
+//            AddActivityNavigationFragment addActivityNavigationFragment = new AddActivityNavigationFragment();
+
             ViewHistoryNavigationFragment viewHist = new ViewHistoryNavigationFragment();
 
             @Override
@@ -120,30 +119,44 @@ public class MainActivity extends AppCompatActivity{
                     transaction.commit();
                 }
 
-                //CASE 2 of buttonAddActivity button pressed while addActNav fragment is already up
+                //CASE 2 of buttonAddActivity button pressed while addActNav fragment is already visible
                 if (v == buttonAddActivity && addActivityNavigationFragment.isVisible()) {
                     Toast.makeText(getApplicationContext(), "Please finish adding the current activity", Toast.LENGTH_SHORT).show();
                 }
 
-                //CASE 3 - buttonViewHistory is pressed while addActNav is up
+                //CASE 3 - buttonViewHistory is pressed and addActNav is visible
                 buttonViewHistory.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v2) {
                         if (addActivityNavigationFragment.isVisible()) {
                             transactionChange.replace(R.id.main_act, viewHist);
                             transactionChange.commit();
                         }
-                        //TODO add case for if add activity is pressed after switching to viewHist
+                        //TODO known bug, having this fragment called twice will cause crash...maybe something about putting it back to stack?
+//                        // CASE 4 - of buttonViewHistory press - it is pressed while addActivityNavigationFragment is visible
+//                        if (v2 == buttonViewHistory && addActivityNavigationFragment.isVisible()){
+//                            Toast.makeText(getApplicationContext(), "fuckkkk", Toast.LENGTH_SHORT).show();
+//                            transactionChange2.replace(R.id.main_act, viewHist);
+//                           transactionChange2.commit();
+//                        }
                     }
                 });
 
+                // CASE 5 - buttonAddActivity is pressed while viewHist fragment is visible
+                if (v == buttonAddActivity && viewHist.isVisible()) {
+                    transactionChangeBack.replace(R.id.main_act, addActivityNavigationFragment);
+                    transactionChangeBack.commit();
+                }
             }
         });
-        //--------------------------------------------------------------------------------end buttonAddActivuty FAB sub-button----
+        //--------------------------------------------------------------------------------end buttonAddActivity FAB sub-button----
+
 
         //--------buttonViewHistory FAB sub-button------------------------------------------------------------
         buttonViewHistory.setOnClickListener(new View.OnClickListener() {
-            FragmentTransaction transaction = manager.beginTransaction();   //transaction for first time button is pressed
-            FragmentTransaction transactionChange = manager.beginTransaction();     //transaction for case if buttonViewHistory is pressed on AddActivity fragment
+            FragmentTransaction transaction = manager.beginTransaction();
+            FragmentTransaction transactionChange = manager.beginTransaction();
+            FragmentTransaction transactionChangeBack = manager.beginTransaction();
+//            FragmentTransaction transactionChange2 = manager.beginTransaction();
             AddActivityNavigationFragment addActivityNavigationFragment = new AddActivityNavigationFragment();
             ViewHistoryNavigationFragment viewHist = new ViewHistoryNavigationFragment();
 
@@ -156,9 +169,7 @@ public class MainActivity extends AppCompatActivity{
                     transaction.commit();
                 }
 
-
-
-                //CASE 3 - buttonAddActivity is pressed while viewHist is up
+                //CASE 2 - buttonAddActivity is pressed while viewHist is up
                 buttonAddActivity.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v2) {
                         if (viewHist.isVisible()) {
@@ -169,29 +180,31 @@ public class MainActivity extends AppCompatActivity{
                         if (v2 == buttonAddActivity && addActivityNavigationFragment.isVisible()) {
                                 Toast.makeText(getApplicationContext(), "Please finish adding the current activity", Toast.LENGTH_SHORT).show();
                         }
-                        //TODO add case for if viewhist is pressed after switching to addactivity
+                        //TODO final case where user has already switched framenets and wants to switch back - known bug
+//                        // CASE 4 - buttonAddActivity is pressed while viewHist is up
+//                        if (v2 == buttonAddActivity && viewHist.isVisible()) {
+//                            Toast.makeText(getApplicationContext(), "changeeee", Toast.LENGTH_SHORT).show();
+//                            //transactionChange2.replace(R.id.main_act, addActivityNavigationFragment);
+//                            //transactionChange2.commit();
+//                        }
                     }
                 });
 
+                // CASE 3 - of buttonViewHistory press - it is pressed while addActivityNavigationFragment is up
+                if (v == buttonViewHistory && addActivityNavigationFragment.isVisible()){
+                    transactionChangeBack.replace(R.id.main_act, viewHist);
+                    transactionChangeBack.commit();
+                }
             }
         });
         //TODO EXTRA: this FAB button code for cases is redundant...ideally  would want to make a class for it...or do a case-switch by implementing  onclicklistener
         //--------------------------------------------------------------------------------end buttonViewActivity FAB sub-button----
 
-            //below is format for adding an activity. pretty much just note setting isProductive boolean and that there is a function for it at bottom @isProductive()
-            //oh and the global variable
-            /*
-            //Link AddModuleNavigationFragment
-            isProductive=true;   //set global productivity status as true so it's added into productive ArrayList
-
-            AddModuleFragment addModFrag = new AddModuleFragment();
-            FragmentTransaction transaction = manager.beginTransaction();
-            transaction.add((R.id.main_act),mainNavFrag,"AddProdModFragID");
-            transaction.commit();
-            */
-
-
         //TODO fix the overall navigation. right now back button exits out of the whole app...should go to previous state...
+            /*
+            for the above ^^ what is happening is that back button functionality is only present by default with activities (it is
+            currently working with GraphActivity). Currenly need to implement it only for case of going from addActFrag back to addActNavFrag
+             */
     }
 
     @Override
@@ -214,11 +227,5 @@ public class MainActivity extends AppCompatActivity{
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    // isProductive() is used to access global isProductive boolean variable to be store a TimeModule as
-    // productive or unproductive in AddModuleFragment
-    public static boolean isProductive() {
-        return isProductive;
     }
 }

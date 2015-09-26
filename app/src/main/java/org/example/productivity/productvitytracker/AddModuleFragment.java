@@ -37,8 +37,6 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
         view = inflater.inflate(R.layout.add_module_fragment, container, false);
 
         //Associate EditText fields and Buttons with layout
-
-
         hours = (EditText) view.findViewById(R.id.editDurationHours);
         minutes = (EditText) view.findViewById(R.id.editDurationMin);
         month = (EditText) view.findViewById(R.id.editMonth);
@@ -62,6 +60,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
             case R.id.finishedInputBtn:
                 askForInput();
                 //Log.v("TEST", "switch1 worked"); //test
+                //TODO clear fields after the button is pressed
                 break;
         }
     }
@@ -121,7 +120,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
 
         //To get whether a module is productive or unproductive access global productivity status
         //TODO change this implementation since going through a global variable is not ideal
-        MainActivity productivityStatus = new MainActivity();
+        AddActivityNavigationFragment productivityStatus = new AddActivityNavigationFragment();
         boolean isItProductive = productivityStatus.isProductive();
 
 

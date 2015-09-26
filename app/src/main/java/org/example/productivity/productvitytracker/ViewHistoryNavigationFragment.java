@@ -2,6 +2,7 @@ package org.example.productivity.productvitytracker;
 
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +15,7 @@ import android.widget.TextView;
  * Fragment that lets users choose whether they want to view thier productive or unproductive
  * activity history.
  */
-public class ViewHistoryNavigationFragment extends Fragment {
+public class ViewHistoryNavigationFragment extends Fragment implements View.OnClickListener {
 
     View view;
 
@@ -37,11 +38,31 @@ public class ViewHistoryNavigationFragment extends Fragment {
         viewProdbtn = (Button) view.findViewById(R.id.prodViewHistoryBtn);
         viewUNprodbtn = (Button) view.findViewById(R.id.UNprodViewHistoryBtn);
 
-        //TODO set onClickListeners for this, follow either mainactivity way or addModuleFragment way
-
+        //Set needed onClickListeners
+        viewProdbtn.setOnClickListener(this);
+        viewUNprodbtn.setOnClickListener(this);
         return view;
     }
 
+    @Override
+    // Functionality for adding a TimeModule. Need to add functionality via implementing OnClickListener in this class to resolve scope errors
+    public void onClick(View v) {
 
+        //TODO differentiate between productive and UNproductive
+        switch (v.getId()) {
+            // User wants to view productive history
+            case R.id.prodViewHistoryBtn:
+                // Use object of intent class to open GraphActivity since it is of type activity
+                Intent prodGraphIntent = new Intent("org.example.productivity.productvitytracker.GraphActivity"); //this is the package of the new activity
+                startActivity(prodGraphIntent);
+                break;
 
+            //User wants to view UNproductive history
+            case R.id.UNprodViewHistoryBtn:
+                // Use object of intent class to open GraphActivity since it is of type activity
+                Intent UNprodGraphIntent = new Intent("org.example.productivity.productvitytracker.GraphActivity"); //this is the package of the new activity
+                startActivity(UNprodGraphIntent);
+                break;
+        }
+    }
 }
