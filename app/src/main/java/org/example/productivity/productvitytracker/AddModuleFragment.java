@@ -10,6 +10,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
@@ -19,9 +25,12 @@ import java.util.ArrayList;
 public class AddModuleFragment extends Fragment implements View.OnClickListener{
 
     View view;
+    public final String prodfileName = "productive_time_module_file";
+    public final String UNprodfileName = "UNproductive_time_module_file";
+
     //Array list to store all TimeModules
     ArrayList<TimeModule> productiveTimeModulesArrayList = new ArrayList<>();
-    ArrayList<TimeModule> unproductiveTimeModulesArrayList = new ArrayList<>();
+    ArrayList<TimeModule> UNproductiveTimeModulesArrayList = new ArrayList<>();
 
     //Needed UI components
     Button finishedInputBtn;
@@ -65,7 +74,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
     }
 
 
-    // askForInput() takes in user input and stores it in TimeModule array list.
+    // askForInput() takes in user input and stores it in TimeModule array list and saves it via StoreModules() method
     public void askForInput() {
 
         final String LOG_TAG2 = "DISPLAY";
@@ -77,7 +86,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
         String actTypeInput;
         // Don't parse input if field is empty as it will cause app to crash. Note they are in the ordered to field
         // positions so that the toast messages show up in a good order.
-        // TODO maybe make a class to check parse but not really worth since message changes
+
         //ACTIVITY TYPE
         if (activityType == null || activityType.getText().toString().matches("")) {
             Toast.makeText(getActivity(), "You forgot to add the activity", Toast.LENGTH_SHORT).show();
@@ -118,10 +127,9 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
         //If all input is okay then notify user activity was added
         Toast.makeText(getActivity(), "Activity was added", Toast.LENGTH_SHORT).show();
 
-        //TODO clear the fields after each new entry i.e button click
+        //TODO clear the fields after each new entry i.e button click --> do this in group method by editText.setText("") for each field
 
         //To get whether a module is productive or unproductive access global productivity status
-        //TODO change this implementation since going through a global variable is not ideal
         AddActivityNavigationFragment productivityStatus = new AddActivityNavigationFragment();
         boolean isItProductive = productivityStatus.isProductive();
 
@@ -129,7 +137,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
         //Process needed values for storing in a TimeModule
         int duration = hrInput * hoursToMinutesConversion + minInput;
         String date = Integer.toString(monthInput) + "/" + Integer.toString(dayInput) + "/" + Integer.toString(yearInput);
-        //TODO change to use android specific process to pick from calender and process as a date, same for duration
+        //TODO EXTRA GOAL: change to use android specific process to pick from calender and process as a date, same for duration
 
 
         TimeModule newTimeModule = new TimeModule(duration, date, actTypeInput, isItProductive);
@@ -139,12 +147,97 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
             Log.v("STATUS", "added to productive list");
         }
         else if (!isItProductive) {
-            unproductiveTimeModulesArrayList.add(newTimeModule);
+            UNproductiveTimeModulesArrayList.add(newTimeModule);
             Log.v("STATUS", "added to UNproductive list");
         }
 
         Log.v(LOG_TAG2, newTimeModule.toString());
         Log.v("TEST", "finished adding to a array list");
 
+        StoreModules();
+        ProcessModules();
+    }
+
+    // Method to store the data to internal device storage obtained from AddModuleFragment
+    public void StoreModules() {
+
+        //To get whether a module is productive or unproductive access global productivity status
+        AddActivityNavigationFragment productivityStatus = new AddActivityNavigationFragment();
+        boolean isItProductive = productivityStatus.isProductive();
+
+        // Write to file
+        try {
+            // If it is a productive time module then save to file for productive time modules
+            if(isItProductive) {
+                FileOutputStream fileOutputStream = getActivity().openFileOutput(prodfileName, getActivity().MODE_PRIVATE);
+                fileOutputStream.write(productiveTimeModulesArrayList.toString().getBytes());
+                fileOutputStream.close();
+                Log.v("SAVE", "saved productive activity");
+            }
+
+            // If it is a UNproductive time module then save to file for UNproductive time modules
+            if(!isItProductive) {
+                FileOutputStream fileOutputStream = getActivity().openFileOutput(UNprodfileName, getActivity().MODE_PRIVATE);
+                fileOutputStream.write(UNproductiveTimeModulesArrayList.toString().getBytes());
+                fileOutputStream.close();
+                Log.v("SAVE", "saved UNproductive activity");
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.v("SAVE", "did not save, error file was not found");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.v("SAVE", "error did not save");
+        }
+    }
+
+    // Method to access and read time modules from the device's internal storage
+    public String ProcessModules(){
+        String fileContents;
+        String noFile = "no file was processed";
+
+        StringBuffer stringBuffer = new StringBuffer(); // used to read strings
+
+        try {
+            //THIS READING TYPE RETURNS ALL MODULES (BOTH PROD AND UNPROD)
+            // Read regardless of productive or UNproductive
+            FileInputStream prodFileInputStream = getActivity().openFileInput("productive_time_module_file");
+            FileInputStream UNprodFileInputStream = getActivity().openFileInput("UNproductive_time_module_file");
+            InputStreamReader prodInputStreamReader = new InputStreamReader(prodFileInputStream);
+            BufferedReader prodBufferedReader = new BufferedReader(prodInputStreamReader);
+            InputStreamReader UNprodInputStreamReader = new InputStreamReader(UNprodFileInputStream);
+            BufferedReader UNprodBufferedReader = new BufferedReader(UNprodInputStreamReader);
+
+            // First read file with productive time modules
+            while ((fileContents = prodBufferedReader.readLine()) != null) {
+                stringBuffer.append(fileContents + "\n");
+                Log.v("READ", "opened and read productive file");
+            }
+
+            // Then read file with UNproductive time modules
+            while ((fileContents = UNprodBufferedReader.readLine()) != null) {
+                stringBuffer.append(fileContents + "\n");
+                Log.v("READ", "opened and read UNproductive file");
+            }
+
+            Log.v("READ", stringBuffer.toString());
+            return stringBuffer.toString(); //displays as [TimeModule, TimeModule, ... , TimeModule]
+
+            /**
+             * Note that this method  returns 2 strings, one only with productive and one only with unproductive
+             * need to investigate whether it is the method itself (don't think so) or the way it is being called.
+             * It is what I want though...just unexpected
+             * To test again view tag in LogCat and notice how the tag displays twice excluding opened notifications (expected once)
+             */
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return noFile;
     }
 }

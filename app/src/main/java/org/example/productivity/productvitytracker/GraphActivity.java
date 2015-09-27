@@ -1,7 +1,7 @@
 package org.example.productivity.productvitytracker;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -12,7 +12,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.util.Random;
 
-public class GraphActivity extends AppCompatActivity {
+public class GraphActivity extends AppCompatActivity{
 
     private static final Random RANDOM = new Random();
     private int lastX = 0;
@@ -36,6 +36,12 @@ public class GraphActivity extends AppCompatActivity {
         viewport.setMaxY(0);
         viewport.setMaxY(10);
         viewport.setScrollable(true);
+
+        //Crashes application...another scope resolution error...
+//        String timeMods;
+//        AddModuleFragment addModuleFragment = new AddModuleFragment();
+//        timeMods = addModuleFragment.processModules();
+//        Log.v("READ", timeMods);
     }
 
     @Override

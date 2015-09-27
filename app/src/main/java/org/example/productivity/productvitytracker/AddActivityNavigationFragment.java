@@ -3,7 +3,6 @@ package org.example.productivity.productvitytracker;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,21 +50,16 @@ public class AddActivityNavigationFragment extends Fragment implements View.OnCl
         //Components to perform fragment activities and needed methods
         FragmentManager manager = getFragmentManager();
         AddModuleFragment addModFrag = new AddModuleFragment();
-        FragmentTransaction addModTrans = manager.beginTransaction();
 
         switch (v.getId()) {
             case R.id.prodAddBtn:
                 isProductive = true;    //set global productivity status as true each time productive button is clicked
-//                addModTrans.replace(R.id.main_act, addModFrag);
-//                addModTrans.commit();
-                manager.beginTransaction().replace(R.id.main_act, addModFrag).addToBackStack("tag").commit();
+                manager.beginTransaction().replace(R.id.main_act, addModFrag).addToBackStack("backFunctionality").commit();   //addToBackStack to work with overridden back button in main
                 break;
 
             case R.id.UNprodAddBtn:
                 isProductive = false;    //set global productivity status as false each time unproductive button is clicked
-//                addModTrans.replace(R.id.main_act, addModFrag);
-//                addModTrans.commit();
-                manager.beginTransaction().replace(R.id.main_act, addModFrag).addToBackStack("tag").commit();
+                manager.beginTransaction().replace(R.id.main_act, addModFrag).addToBackStack("backFunctionality").commit();
                 break;
         }
     }

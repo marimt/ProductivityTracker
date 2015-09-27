@@ -29,10 +29,10 @@ public class MainActivity extends AppCompatActivity{
     //=========================================================================================================================================
     /**
      * 5) customize GraphActivity
+     * 5aa) be able to access files on GraphActivity..currently getting scope errors
      * 5a) differentiate between viewing a prod and UNprod graphActivity
      * 5c) update viewNavFrag onClickListeners for differentiation
      * 5d) set up sub goals for storage
-     * 6) storage
      * 7) prettify
      * 9) fix bugs in to dos
      * 8) test and port out yo
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity{
         final SubActionButton buttonViewHistory = itemBuilder.setContentView(viewHistoryFAB).build();
 
         //Create submenu for FAB sub-buttons
-        FloatingActionMenu actionMenu = new FloatingActionMenu.Builder(this)
+        final FloatingActionMenu actionMenu = new FloatingActionMenu.Builder(this)
                 .addSubActionView(buttonAddActivity)   //sub-button
                 .addSubActionView(buttonViewHistory) //sub-button
                 .attachTo(floatingActionButton) //main button
@@ -106,7 +106,6 @@ public class MainActivity extends AppCompatActivity{
             FragmentTransaction transactionChange = manager.beginTransaction();
             FragmentTransaction transactionChangeBack = manager.beginTransaction();
             FragmentTransaction transactionChange2 = manager.beginTransaction();
-//            AddActivityNavigationFragment addActivityNavigationFragment = new AddActivityNavigationFragment();
 
             ViewHistoryNavigationFragment viewHist = new ViewHistoryNavigationFragment();
 
@@ -134,7 +133,7 @@ public class MainActivity extends AppCompatActivity{
                         //TODO known bug, having this fragment called twice will cause crash...maybe something about putting it back to stack?
 //                        // CASE 4 - of buttonViewHistory press - it is pressed while addActivityNavigationFragment is visible
 //                        if (v2 == buttonViewHistory && addActivityNavigationFragment.isVisible()){
-//                            Toast.makeText(getApplicationContext(), "fuckkkk", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(getApplicationContext(), "testing back twice", Toast.LENGTH_SHORT).show();
 //                            transactionChange2.replace(R.id.main_act, viewHist);
 //                           transactionChange2.commit();
 //                        }
