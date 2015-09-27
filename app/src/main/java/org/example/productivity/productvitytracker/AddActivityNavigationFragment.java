@@ -56,14 +56,16 @@ public class AddActivityNavigationFragment extends Fragment implements View.OnCl
         switch (v.getId()) {
             case R.id.prodAddBtn:
                 isProductive = true;    //set global productivity status as true each time productive button is clicked
-                addModTrans.replace(R.id.main_act, addModFrag);
-                addModTrans.commit();
+//                addModTrans.replace(R.id.main_act, addModFrag);
+//                addModTrans.commit();
+                manager.beginTransaction().replace(R.id.main_act, addModFrag).addToBackStack("tag").commit();
                 break;
 
             case R.id.UNprodAddBtn:
                 isProductive = false;    //set global productivity status as false each time unproductive button is clicked
-                addModTrans.replace(R.id.main_act, addModFrag);
-                addModTrans.commit();
+//                addModTrans.replace(R.id.main_act, addModFrag);
+//                addModTrans.commit();
+                manager.beginTransaction().replace(R.id.main_act, addModFrag).addToBackStack("tag").commit();
                 break;
         }
     }
@@ -75,3 +77,4 @@ public class AddActivityNavigationFragment extends Fragment implements View.OnCl
     }
 
 }
+

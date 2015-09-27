@@ -199,12 +199,24 @@ public class MainActivity extends AppCompatActivity{
         });
         //TODO EXTRA: this FAB button code for cases is redundant...ideally  would want to make a class for it...or do a case-switch by implementing  onclicklistener
         //--------------------------------------------------------------------------------end buttonViewActivity FAB sub-button----
+    }
 
-        //TODO fix the overall navigation. right now back button exits out of the whole app...should go to previous state...
-            /*
-            for the above ^^ what is happening is that back button functionality is only present by default with activities (it is
-            currently working with GraphActivity). Currenly need to implement it only for case of going from addActFrag back to addActNavFrag
-             */
+
+    @Override
+    // Override this method to implement back button functionality for fragments
+    public void onBackPressed() {
+
+        // keep track of count or behavior will be that fragment will go back THEN close out of the app
+        int count = getFragmentManager().getBackStackEntryCount();
+
+        if (count == 0) {
+            super.onBackPressed();
+            getFragmentManager().popBackStack();
+        }
+        else {
+            getFragmentManager().popBackStack();
+        }
+
     }
 
     @Override

@@ -59,7 +59,6 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
         switch (v.getId()) {
             case R.id.finishedInputBtn:
                 askForInput();
-                //Log.v("TEST", "switch1 worked"); //test
                 //TODO clear fields after the button is pressed
                 break;
         }
@@ -115,6 +114,9 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
             return;
         }
         else { yearInput = Integer.parseInt(year.getText().toString()); }
+
+        //If all input is okay then notify user activity was added
+        Toast.makeText(getActivity(), "Activity was added", Toast.LENGTH_SHORT).show();
 
         //TODO clear the fields after each new entry i.e button click
 
