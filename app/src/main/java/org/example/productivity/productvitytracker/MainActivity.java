@@ -4,7 +4,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +19,7 @@ import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 public class MainActivity extends AppCompatActivity{
 
     FragmentManager manager = getFragmentManager();
-    Toolbar toolbar;
+    //Toolbar toolbar;
 
     //Needed UI components
     EditText hours, minutes, month, day, year, activityType;    //for AddModuleFragment
@@ -28,8 +27,8 @@ public class MainActivity extends AppCompatActivity{
     //=========================================================================================================================================
     //=========================================================================================================================================
     /**
-     * 5) customize GraphActivity
-     * 5aa) be able to access files on GraphActivity..currently getting scope errors
+     * 4) have return type of processdata methods be a 2D array or add global variables for those
+     * 5) wire GraphActivity
      * 5a) differentiate between viewing a prod and UNprod graphActivity
      * 5c) update viewNavFrag onClickListeners for differentiation
      * 5d) set up sub goals for storage
@@ -58,7 +57,7 @@ public class MainActivity extends AppCompatActivity{
         activityType = (EditText) findViewById(R.id.editActivityType);
 
         //TODO fix the toolbar
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //toolbar = (Toolbar) findViewById(R.id.toolbar);
 
 
         //Add default welcome layout. Will be switched for other layouts (add activity, history) depending on user behavior

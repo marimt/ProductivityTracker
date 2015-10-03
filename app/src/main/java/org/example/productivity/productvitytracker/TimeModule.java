@@ -8,19 +8,19 @@ package org.example.productivity.productvitytracker;
 public class TimeModule {
 
     //Needed Variables
-    float duration;
+    double duration;
     String date, typeOfActivity;    //typeOfActivity e.g. homework, facebook, etc
     boolean isProductive;
 
 
-    public TimeModule(int duration, String date, String typeOfActivity, boolean isProductive) {
+    public TimeModule(double duration, String date, String typeOfActivity, boolean isProductive) {
         this.duration = duration;
         this.date = date;
         this.typeOfActivity = typeOfActivity;
         this.isProductive = isProductive;
     }
 
-    public float getDuration() {
+    public double getDuration() {
         return duration;
     }
 
@@ -55,6 +55,7 @@ public class TimeModule {
 
     @Override
     public String toString() {
+        //TODO EXTRA: This is not a good way to seperate the variables. GraphActivity ProcessData() depends on this format --> when fix make sure still works.
         return "TimeModule{" +
                 "duration=" + duration +
                 ", date='" + date + '\'' +

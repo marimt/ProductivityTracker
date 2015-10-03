@@ -10,19 +10,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
  * The fragment user goes to after clicking Productive or Unproductive button to add an activity.
  */
 
-public class AddModuleFragment extends Fragment implements View.OnClickListener{
+public class AddModuleFragment extends Fragment implements View.OnClickListener {
 
     View view;
     public final String prodfileName = "productive_time_module_file";
@@ -52,7 +48,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
         day = (EditText) view.findViewById(R.id.editDay);
         year = (EditText) view.findViewById(R.id.editYear);
         activityType = (EditText) view.findViewById(R.id.editActivityType);
-        finishedInputBtn =  (Button) view.findViewById(R.id.finishedInputBtn);
+        finishedInputBtn = (Button) view.findViewById(R.id.finishedInputBtn);
 
         //Set needed OnClickListeners
         finishedInputBtn.setOnClickListener(this);
@@ -62,27 +58,28 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
 
 
     @Override
-    //Only using 1 case now which makes this switch pointless but set up just in case new buttons
+    // OnClickListener cases
     public void onClick(View v) {
-        //do what you want to do when button is clicked
         switch (v.getId()) {
             case R.id.finishedInputBtn:
                 askForInput();
-                //TODO clear fields after the button is pressed
                 break;
         }
     }
 
 
-    // askForInput() takes in user input and stores it in TimeModule array list and saves it via StoreModules() method
+    // askForInput() takes in user input and stores it in TimeModule array list
+    //TODO EXTRA: User can only enter realistic dates.
     public void askForInput() {
 
         final String LOG_TAG2 = "DISPLAY";
-        final int hoursToMinutesConversion = 60;
+        final int minutesToHoursConversion = 60;
 
 
         // Get input from editText fields.
-        int hrInput, minInput, monthInput, dayInput, yearInput;
+        int hrInput, monthInput, dayInput, yearInput;
+        double minInput;
+
         String actTypeInput;
         // Don't parse input if field is empty as it will cause app to crash. Note they are in the ordered to field
         // positions so that the toast messages show up in a good order.
@@ -91,38 +88,64 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
         if (activityType == null || activityType.getText().toString().matches("")) {
             Toast.makeText(getActivity(), "You forgot to add the activity", Toast.LENGTH_SHORT).show();
             return;
+        } else {
+            actTypeInput = activityType.getText().toString();
         }
-        else { actTypeInput = activityType.getText().toString(); }
         //HOURS
         if (hours == null || hours.getText().toString().matches("")) {
             Toast.makeText(getActivity(), "You forgot to add how many hours", Toast.LENGTH_SHORT).show();
             return;
         }
-        else { hrInput = Integer.parseInt(hours.getText().toString()); }
+        if ( Integer.parseInt(hours.getText().toString()) >= 25 ) {
+            Toast.makeText(getActivity(), "Please between 0 and 24 hours", Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            hrInput = Integer.parseInt(hours.getText().toString());
+        }
         //MINUTES
         if (minutes == null || minutes.getText().toString().matches("")) {
             Toast.makeText(getActivity(), "You forgot to add how many minutes", Toast.LENGTH_SHORT).show();
             return;
         }
-        else { minInput = Integer.parseInt(minutes.getText().toString()); }
+        if ( Integer.parseInt(minutes.getText().toString()) >= 4501 ) {    //4500 minutes => 75 hours. 75+24 = 99 = max acceptable total processable hours
+            Toast.makeText(getActivity(), "Please re-enter your minutes", Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            minInput = Integer.parseInt(minutes.getText().toString());
+        }
         //MONTHS
         if (month == null || month.getText().toString().matches("")) {
             Toast.makeText(getActivity(), "You forgot to the month", Toast.LENGTH_SHORT).show();
             return;
         }
-        else { monthInput = Integer.parseInt(month.getText().toString()); }
+        if (month.getText().toString().length() != 2) {
+            Toast.makeText(getActivity(), "Please user MM format", Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            monthInput = Integer.parseInt(month.getText().toString());
+        }
         //DAYS
         if (day == null || day.getText().toString().matches("")) {
             Toast.makeText(getActivity(), "You forgot to add what day", Toast.LENGTH_SHORT).show();
             return;
         }
-        else { dayInput = Integer.parseInt(day.getText().toString()); }
+        if (day.getText().toString().length() != 2) {
+            Toast.makeText(getActivity(), "Please user DD format", Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            dayInput = Integer.parseInt(day.getText().toString());
+        }
         //YEAR
         if (year == null || year.getText().toString().matches("")) {
             Toast.makeText(getActivity(), "You forgot to add the year", Toast.LENGTH_SHORT).show();
             return;
         }
-        else { yearInput = Integer.parseInt(year.getText().toString()); }
+        if (year.getText().toString().length() != 4) {
+            Toast.makeText(getActivity(), "Please user YYYY format", Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            yearInput = Integer.parseInt(year.getText().toString());
+        }
 
         //If all input is okay then notify user activity was added
         Toast.makeText(getActivity(), "Activity was added", Toast.LENGTH_SHORT).show();
@@ -135,18 +158,19 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
 
 
         //Process needed values for storing in a TimeModule
-        int duration = hrInput * hoursToMinutesConversion + minInput;
-        String date = Integer.toString(monthInput) + "/" + Integer.toString(dayInput) + "/" + Integer.toString(yearInput);
+        double duration = Math.round( (hrInput + ( minInput / minutesToHoursConversion )) * 100.0) / 100.0 ;    //round to nearest 2 decimal places
+
+        String date = Integer.toString(monthInput) + Integer.toString(dayInput) + Integer.toString(yearInput);  //not separated with "/" for sorting purposes in GraphActivity
+
         //TODO EXTRA GOAL: change to use android specific process to pick from calender and process as a date, same for duration
 
 
-        TimeModule newTimeModule = new TimeModule(duration, date, actTypeInput, isItProductive);
+        TimeModule newTimeModule = new TimeModule(duration, date, actTypeInput, isItProductive);    //TODO EXTRA GOAL: round to nearest 2 decimal places
 
         if (isItProductive) {
             productiveTimeModulesArrayList.add(newTimeModule);
             Log.v("STATUS", "added to productive list");
-        }
-        else if (!isItProductive) {
+        } else if (!isItProductive) {
             UNproductiveTimeModulesArrayList.add(newTimeModule);
             Log.v("STATUS", "added to UNproductive list");
         }
@@ -155,10 +179,10 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
         Log.v("TEST", "finished adding to a array list");
 
         StoreModules();
-        ProcessModules();
     }
 
     // Method to store the data to internal device storage obtained from AddModuleFragment
+    //TODO check more but it may be the case that this is only saving per session on app not across sessions
     public void StoreModules() {
 
         //To get whether a module is productive or unproductive access global productivity status
@@ -168,7 +192,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
         // Write to file
         try {
             // If it is a productive time module then save to file for productive time modules
-            if(isItProductive) {
+            if (isItProductive) {
                 FileOutputStream fileOutputStream = getActivity().openFileOutput(prodfileName, getActivity().MODE_PRIVATE);
                 fileOutputStream.write(productiveTimeModulesArrayList.toString().getBytes());
                 fileOutputStream.close();
@@ -176,7 +200,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
             }
 
             // If it is a UNproductive time module then save to file for UNproductive time modules
-            if(!isItProductive) {
+            if (!isItProductive) {
                 FileOutputStream fileOutputStream = getActivity().openFileOutput(UNprodfileName, getActivity().MODE_PRIVATE);
                 fileOutputStream.write(UNproductiveTimeModulesArrayList.toString().getBytes());
                 fileOutputStream.close();
@@ -191,53 +215,5 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener{
             e.printStackTrace();
             Log.v("SAVE", "error did not save");
         }
-    }
-
-    // Method to access and read time modules from the device's internal storage
-    public String ProcessModules(){
-        String fileContents;
-        String noFile = "no file was processed";
-
-        StringBuffer stringBuffer = new StringBuffer(); // used to read strings
-
-        try {
-            //THIS READING TYPE RETURNS ALL MODULES (BOTH PROD AND UNPROD)
-            // Read regardless of productive or UNproductive
-            FileInputStream prodFileInputStream = getActivity().openFileInput("productive_time_module_file");
-            FileInputStream UNprodFileInputStream = getActivity().openFileInput("UNproductive_time_module_file");
-            InputStreamReader prodInputStreamReader = new InputStreamReader(prodFileInputStream);
-            BufferedReader prodBufferedReader = new BufferedReader(prodInputStreamReader);
-            InputStreamReader UNprodInputStreamReader = new InputStreamReader(UNprodFileInputStream);
-            BufferedReader UNprodBufferedReader = new BufferedReader(UNprodInputStreamReader);
-
-            // First read file with productive time modules
-            while ((fileContents = prodBufferedReader.readLine()) != null) {
-                stringBuffer.append(fileContents + "\n");
-                Log.v("READ", "opened and read productive file");
-            }
-
-            // Then read file with UNproductive time modules
-            while ((fileContents = UNprodBufferedReader.readLine()) != null) {
-                stringBuffer.append(fileContents + "\n");
-                Log.v("READ", "opened and read UNproductive file");
-            }
-
-            Log.v("READ", stringBuffer.toString());
-            return stringBuffer.toString(); //displays as [TimeModule, TimeModule, ... , TimeModule]
-
-            /**
-             * Note that this method  returns 2 strings, one only with productive and one only with unproductive
-             * need to investigate whether it is the method itself (don't think so) or the way it is being called.
-             * It is what I want though...just unexpected
-             * To test again view tag in LogCat and notice how the tag displays twice excluding opened notifications (expected once)
-             */
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return noFile;
     }
 }

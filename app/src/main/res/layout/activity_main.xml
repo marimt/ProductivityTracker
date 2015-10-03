@@ -7,14 +7,10 @@
     android:id="@+id/main_act">
 
     <!--
+
         activity_main layout is blank since actions are now controlled by floating action
         button which is implemented in MainActivity.java
 
-
-
-        TODO I want to have a simple text layout here saying welcome or something but don't implement that yet
-            for the above you could do an introductory fragment that is on the blank screen by default then switch it
-            out when user tries to add new activity or view history
     -->
 
 </RelativeLayout>
