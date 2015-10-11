@@ -27,11 +27,8 @@ public class MainActivity extends AppCompatActivity{
     //=========================================================================================================================================
     //=========================================================================================================================================
     /**
-     * 4) have return type of processdata methods be a 2D array or add global variables for those
-     * 5) wire GraphActivity
-     * 5a) differentiate between viewing a prod and UNprod graphActivity
-     * 5c) update viewNavFrag onClickListeners for differentiation
-     * 5d) set up sub goals for storage
+     * 5) wire GraphActivity date
+     * 6) Insert activities into sorted order based on date --- VERY IMPORTANT
      * 7) prettify
      * 9) fix bugs in to dos
      * 8) test and port out yo

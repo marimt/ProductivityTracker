@@ -107,8 +107,8 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
             Toast.makeText(getActivity(), "You forgot to add how many minutes", Toast.LENGTH_SHORT).show();
             return;
         }
-        if ( Integer.parseInt(minutes.getText().toString()) >= 4501 ) {    //4500 minutes => 75 hours. 75+24 = 99 = max acceptable total processable hours
-            Toast.makeText(getActivity(), "Please re-enter your minutes", Toast.LENGTH_SHORT).show();
+        if ( Integer.parseInt(minutes.getText().toString()) >= 61 ) {    //60 minutes => 1 hour to be valid minutes
+            Toast.makeText(getActivity(), "Please re-enter between 0-60 minutes", Toast.LENGTH_SHORT).show();
             return;
         } else {
             minInput = Integer.parseInt(minutes.getText().toString());
@@ -175,8 +175,9 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
             Log.v("STATUS", "added to UNproductive list");
         }
 
-        Log.v(LOG_TAG2, newTimeModule.toString());
-        Log.v("TEST", "finished adding to a array list");
+        Log.v("ADDED", newTimeModule.toString());
+        Log.v("PRODARRAYCONTENTS@ADD", productiveTimeModulesArrayList.toString());
+        Log.v("UNPRODARRAYCONTENTS@ADD", UNproductiveTimeModulesArrayList.toString());
 
         StoreModules();
     }

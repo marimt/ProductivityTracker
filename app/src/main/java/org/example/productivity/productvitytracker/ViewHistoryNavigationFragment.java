@@ -22,6 +22,7 @@ public class ViewHistoryNavigationFragment extends Fragment implements View.OnCl
     //Needed UI components
     TextView viewHistoryText;
     Button viewProdbtn, viewUNprodbtn;
+    public static boolean isProductiveGraph;   //graph type for GraphActivity
 
     public ViewHistoryNavigationFragment() {
         // Required empty public constructor
@@ -55,6 +56,7 @@ public class ViewHistoryNavigationFragment extends Fragment implements View.OnCl
                 // Use object of intent class to open GraphActivity since it is of type activity
                 Intent prodGraphIntent = new Intent("org.example.productivity.productvitytracker.GraphActivity"); //this is the package of the new activity
                 startActivity(prodGraphIntent);
+                isProductiveGraph = true;   //set graph type
                 break;
 
             //User wants to view UNproductive history
@@ -62,7 +64,14 @@ public class ViewHistoryNavigationFragment extends Fragment implements View.OnCl
                 // Use object of intent class to open GraphActivity since it is of type activity
                 Intent UNprodGraphIntent = new Intent("org.example.productivity.productvitytracker.GraphActivity"); //this is the package of the new activity
                 startActivity(UNprodGraphIntent);
+                isProductiveGraph = false;  //set graph type
                 break;
         }
+    }
+
+    // getGraphProdStatus() is used to access global isProductiveGraph boolean variable to communicate to GraphActivity whether user wants
+    // ro see a productive or unproductive graph
+    public static boolean getGraphProdStatus() {
+        return isProductiveGraph;
     }
 }

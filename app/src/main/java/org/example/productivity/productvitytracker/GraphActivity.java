@@ -17,37 +17,90 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class GraphActivity extends AppCompatActivity {
-
-
-    private static final Random RANDOM = new Random();
-    private int lastX = 0;
-    private LineGraphSeries<DataPoint> series;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.graph_activity);
 
-        GraphView prodLineGraph = (GraphView) findViewById(R.id.lineprodgraph);
+        GraphView lineGraph = (GraphView) findViewById(R.id.linegraph);
 
-        //Data
-        series = new LineGraphSeries<DataPoint>();
-        prodLineGraph.addSeries(series);
+        //Get isProductiveGraph boolean status to use either productive or UNproductive methods
+        ViewHistoryNavigationFragment viewHNFstatus = new ViewHistoryNavigationFragment();
+        boolean isItProductiveGraph = viewHNFstatus.getGraphProdStatus();
 
-        //TODO learn and customize graph more
+
         //Customize
-        Viewport viewport = prodLineGraph.getViewport();
+        Viewport viewport = lineGraph.getViewport();
         viewport.setYAxisBoundsManual(true);
-        viewport.setMaxY(0);
-        viewport.setMaxY(10);
+        viewport.setXAxisBoundsManual(true);
+        viewport.setMaxY(0);    //assume no negative times
+        viewport.setMaxY(24);   //24 hours is max time. Reasoning: 24 hrs/day
+        viewport.setMaxX(0);    //assume no negative dates
+        viewport.setMaxX(20);   //for now display max 20 points -- consider changing addActivity to add to the front of list
         viewport.setScrollable(true);
 
-        //Crashes application...another scope resolution error...
-        Log.v("GRAPH", ReadProductiveModules());
-        ProcessProductiveData();
+        if (isItProductiveGraph) {
+            //Get user data
+            ArrayList<Double> extractedProdDurationData = ProcessProductiveDurationData();
+            Log.v("CONTENTS", extractedProdDurationData.toString());
+            ArrayList<Integer> extractedProdDateData = ProcessProductiveDateData();
+
+            int testXPos = 0;   //Will eventually move to ^ extractedProdDateData through adding a enum and/or insertion sort @ addModule
+            int amntOfPoints = extractedProdDurationData.size();
+            int yCoordArrayPosition = 0;
+
+            //Go though data
+            LineGraphSeries<DataPoint> series = new LineGraphSeries<>();
+            while (amntOfPoints != 0) {
+                //Add point to graph
+                DataPoint point = new DataPoint(testXPos, extractedProdDurationData.get(yCoordArrayPosition));
+                series.appendData(point, true, 20);
+
+                Log.v("PRODPOINT", "added" + extractedProdDurationData.get(yCoordArrayPosition));
+                yCoordArrayPosition++;
+                testXPos++;
+                amntOfPoints--;
+            }
+
+            //draw graph when all points are added
+            lineGraph.addSeries(series);
+
+
+            Log.v("INFO", "read productive information");
+        }
+
+        if (!isItProductiveGraph) {
+            //Get user data
+            ArrayList<Double> extractedUNProdDurationData = ProcessUNproductiveDurationData();
+            Log.v("CONTENTS", extractedUNProdDurationData.toString());
+            ArrayList<Integer> extractedUNProdDateData = ProcessUNproductiveDateData();
+
+            int testXPos = 0;   //Will eventually move to ^ extractedProdDateData through adding a enum and/or insertion sort @ addModule
+            int amntOfPoints = extractedUNProdDurationData.size();
+            int yCoordArrayPosition = 0;
+
+            //Go though data
+            LineGraphSeries<DataPoint> series = new LineGraphSeries<>();
+            while (amntOfPoints != 0) {
+                //Add point to graph
+                DataPoint point = new DataPoint(testXPos, extractedUNProdDurationData.get(yCoordArrayPosition));
+                series.appendData(point, true, 20);
+
+                Log.v("UNPRODPOINT", "added" + extractedUNProdDurationData.get(yCoordArrayPosition));
+                yCoordArrayPosition++;
+                testXPos++;
+                amntOfPoints--;
+            }
+
+            //draw graph when all points are added
+            lineGraph.addSeries(series);
+
+
+            Log.v("INFO", "read unproductive information");
+        }
     }
 
     @Override
@@ -72,39 +125,6 @@ public class GraphActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    //TODO go over this and see if is neccessary
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //simulate real time with thread that appends data to the the graph
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //add 100 new entries
-                for (int i = 0; i < 100; i++) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            addEntry();
-                        }
-                    });
-                    //sleep to slow down the addition of entries
-                    try {
-                        Thread.sleep(600);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start(); //before this it was not showing any points on viewport
-    }
-
-    //TODO maybe put all this in a seperate class...
-    private void addEntry() {
-        // Display max 10 points on the viewport and we scroll to end
-        series.appendData(new DataPoint(lastX++, RANDOM.nextDouble() * 10d), true, 10);
-    }
-
     // Method to access and read productive time modules from the device's internal storage
     public String ReadProductiveModules() {
         String fileContents;
@@ -124,7 +144,7 @@ public class GraphActivity extends AppCompatActivity {
                 Log.v("READ", "opened and read productive file");
             }
 
-            //Log.v("READ", stringBuffer.toString());
+            Log.v("CHECKPRODBUFFREAD", stringBuffer.toString());
             return stringBuffer.toString(); //displays as [TimeModule, TimeModule, ... , TimeModule]
 
         } catch (FileNotFoundException e) {
@@ -154,7 +174,7 @@ public class GraphActivity extends AppCompatActivity {
                 Log.v("READ", "opened and read UNproductive file");
             }
 
-            //Log.v("READ", stringBuffer.toString());
+            Log.v("CHECKUNPRODBUFFREAD", stringBuffer.toString());
             return stringBuffer.toString(); //displays as [TimeModule, TimeModule, ... , TimeModule]
 
         } catch (FileNotFoundException e) {
@@ -165,18 +185,14 @@ public class GraphActivity extends AppCompatActivity {
         return noFile;
     }
 
-    // Method to process raw data obtained from ReadProductiveModules()
-    public void ProcessProductiveData() {
+    // Method to process raw data obtained from ReadProductiveModules() and retrieve the productive durations
+    public ArrayList<Double> ProcessProductiveDurationData() {
         //State of Data at this point is [TimeModule{duration=DOUBLE, date='STRING', typeOfActivity='STRING', isProductive=BOOLEAN}]
-        //In order to graph data we need to extract date and duration. Date will be Y-Axis and Duration will be X-Axis.
-
-
-        //TODO currently does not return anything...maybe have it return a 2D array that holds coordinates of graph. Single arrays will be combined to form 2D array with coords
+        //In order to graph data we need to extract duration as duration will be the Y-Axis.
 
         String processedData;
         processedData = ReadProductiveModules();
         ArrayList<Double> productiveDurations = new ArrayList<>();
-        ArrayList<Integer> productiveDates = new ArrayList<>();
 
         for (int i = 0; i < processedData.length(); i++) {  //iterate through characters in stored time modules file
             // Extract duration. To do this look for the sequence of characters [i,o,n,=] that point towards a duration coming up.
@@ -186,43 +202,55 @@ public class GraphActivity extends AppCompatActivity {
                 if (processedData.charAt(i + 7) != ',' && processedData.charAt(i + 7) != ' ' && processedData.charAt(i + 7) != 'd') //check for [ \, , d, a ] since they are next possible characters
                     durationEntryString += processedData.charAt(i + 7);
                 if (processedData.charAt(i + 8) != ',' && processedData.charAt(i + 8) != ' ' && processedData.charAt(i + 8) != 'd')
-                    durationEntryString += processedData.charAt(i + 8); // XX.XX is limit. This is in hours and seems reasonable to limit at 99.99 hours for an activity.
-
+                    durationEntryString += processedData.charAt(i + 8); // XX.XX/24.00 is limit.
 
                 productiveDurations.add(Double.parseDouble(durationEntryString));
 
-                Log.v("PRODCHECK", durationEntryString);
-                Log.v("PRODARRAYLIST", productiveDurations.toString());
+                Log.v("PRODDURATIONCHECK", durationEntryString);
+                Log.v("PRODDURATIONARRAYLIST", productiveDurations.toString());
             }
+        }
+        return productiveDurations;
+    }
 
+    // Method to process raw data obtained from ReadProductiveModules() and retrieve the productive dates
+    public ArrayList<Integer> ProcessProductiveDateData() {
+        //State of Data at this point is [TimeModule{duration=DOUBLE, date='STRING', typeOfActivity='STRING', isProductive=BOOLEAN}]
+        //In order to graph data we need to extract date as date will be the X-Axis.
+
+        String processedData;
+        processedData = ReadProductiveModules();
+        ArrayList<Integer> productiveDates = new ArrayList<>();
+
+        for (int i = 0; i < processedData.length(); i++) {  //iterate through characters in stored time modules file
             // Extract date. To do this look for the sequence of characters [t,e,=, '] that point towards a date coming up.
             if (processedData.charAt(i) == 't' && processedData.charAt(i + 1) == 'e' && processedData.charAt(i + 2) == '=' && processedData.charAt(i + 3) == '\'') { //TODO make this a more rigorous check
                 // The format for a date is constrained to MMDDYYYY
                 String dateEntryString = "";
+
                 for (int dateIndex = (i + 4); dateIndex <= (i + 11); dateIndex++) {
-                    dateEntryString += processedData.charAt(dateIndex);
+                    if (processedData.charAt(dateIndex) != ',' && processedData.charAt(dateIndex) != ' ' && processedData.charAt(dateIndex) != '\'')
+                        dateEntryString += processedData.charAt(dateIndex);
                 }
 
-                productiveDates.add(Integer.parseInt(dateEntryString));
+                //productiveDates.add(Integer.parseInt(dateEntryString));
+                //TODO add to list when bugs cleaned up
 
-                Log.v("PRODCHECK", dateEntryString);
-                Log.v("PRODARRAYLIST", productiveDurations.toString());
+                //Log.v("PRODDATECHECK", dateEntryString);
+                Log.v("PRODDATEARRAYLIST", productiveDates.toString());
             }
         }
+        return productiveDates;
     }
 
-    // Method to process raw data obtained from ReadUNproductiveModules()
-    public void ProcessUNproductiveData() {
+    // Method to process raw data obtained from ReadProductiveModules() and retrieve the UNproductive durations
+    public ArrayList<Double> ProcessUNproductiveDurationData() {
         //State of Data at this point is [TimeModule{duration=DOUBLE, date='STRING', typeOfActivity='STRING', isProductive=BOOLEAN}]
-        //In order to graph data we need to extract date and duration. Date will be Y-Axis and Duration will be X-Axis.
-
-
-        //TODO currently does not return anything...maybe have it return a 2D array that holds coordinates of graph. Single arrays will be combined to form 2D array with coords
+        //In order to graph data we need to extract duration as duration will be the Y-Axis.
 
         String processedData;
         processedData = ReadUNproductiveModules();
         ArrayList<Double> UNproductiveDurations = new ArrayList<>();
-        ArrayList<Integer> UNproductiveDates = new ArrayList<>();
 
         for (int i = 0; i < processedData.length(); i++) {  //iterate through characters in stored time modules file
             // Extract duration. To do this look for the sequence of characters [i,o,n,=] that point towards a duration coming up.
@@ -234,26 +262,40 @@ public class GraphActivity extends AppCompatActivity {
                 if (processedData.charAt(i + 8) != ',' && processedData.charAt(i + 8) != ' ' && processedData.charAt(i + 8) != 'd')
                     durationEntryString += processedData.charAt(i + 8); // XX.XX is limit. This is in hours and seems reasonable to limit at 99.99 hours for an activity.
 
-
                 UNproductiveDurations.add(Double.parseDouble(durationEntryString));
 
-                Log.v("UNPRODCHECK", durationEntryString);
-                Log.v("UNPRODARRAYLIST", UNproductiveDurations.toString());
+                Log.v("PRODDURATIONCHECK", durationEntryString);
+                Log.v("PRODDURATIONARRAYLIST", UNproductiveDurations.toString());
             }
+        }
+        return UNproductiveDurations;
+    }
 
+    // Method to process raw data obtained from ReadProductiveModules() and retrieve the UNproductive dates
+    public ArrayList<Integer> ProcessUNproductiveDateData() {
+        //State of Data at this point is [TimeModule{duration=DOUBLE, date='STRING', typeOfActivity='STRING', isProductive=BOOLEAN}]
+        //In order to graph data we need to extract date as date will be the X-Axis.
+
+        String processedData;
+        processedData = ReadUNproductiveModules();
+        ArrayList<Integer> UNproductiveDates = new ArrayList<>();
+
+        for (int i = 0; i < processedData.length(); i++) {  //iterate through characters in stored time modules file
             // Extract date. To do this look for the sequence of characters [t,e,=, '] that point towards a date coming up.
             if (processedData.charAt(i) == 't' && processedData.charAt(i + 1) == 'e' && processedData.charAt(i + 2) == '=' && processedData.charAt(i + 3) == '\'') { //TODO make this a more rigorous check
                 // The format for a date is constrained to MMDDYYYY
                 String dateEntryString = "";
+
                 for (int dateIndex = (i + 4); dateIndex <= (i + 11); dateIndex++) {
                     dateEntryString += processedData.charAt(dateIndex);
                 }
 
-                UNproductiveDates.add(Integer.parseInt(dateEntryString));
+                //UNproductiveDates.add(Integer.parseInt(dateEntryString));
 
-                Log.v("UNPRODCHECK", dateEntryString);
-                Log.v("UNPRODARRAYLIST", UNproductiveDurations.toString());
+                Log.v("UNPRODDATECHECK", dateEntryString);
+                //Log.v("UNPRODDATEARRAYLIST", UNproductiveDates.toString());
             }
         }
+        return UNproductiveDates;
     }
 }
