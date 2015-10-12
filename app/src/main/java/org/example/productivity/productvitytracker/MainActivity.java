@@ -27,11 +27,10 @@ public class MainActivity extends AppCompatActivity{
     //=========================================================================================================================================
     //=========================================================================================================================================
     /**
-     * 5) wire GraphActivity date
-     * 6) Insert activities into sorted order based on date --- VERY IMPORTANT
      * 7) prettify
      * 9) fix bugs in to dos
      * 8) test and port out yo
+     * Note: bugs not critical for demo purposes and additional features on Trello board.
      */
     //=========================================================================================================================================
     //=========================================================================================================================================
@@ -192,7 +191,6 @@ public class MainActivity extends AppCompatActivity{
                 }
             }
         });
-        //TODO EXTRA: this FAB button code for cases is redundant...ideally  would want to make a class for it...or do a case-switch by implementing  onclicklistener
         //--------------------------------------------------------------------------------end buttonViewActivity FAB sub-button----
     }
 

@@ -27,6 +27,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
     //Array list to store all TimeModules
     ArrayList<TimeModule> productiveTimeModulesArrayList = new ArrayList<>();
     ArrayList<TimeModule> UNproductiveTimeModulesArrayList = new ArrayList<>();
+    ArrayList<Integer> datesForSorting = new ArrayList<>();
 
     //Needed UI components
     Button finishedInputBtn;
@@ -68,7 +69,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
     }
 
 
-    // askForInput() takes in user input and stores it in TimeModule array list
+    // askForInput() takes in user input and returns a TimeModule.
     //TODO EXTRA: User can only enter realistic dates.
     public void askForInput() {
 
@@ -162,16 +163,34 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
 
         String date = Integer.toString(monthInput) + Integer.toString(dayInput) + Integer.toString(yearInput);  //not separated with "/" for sorting purposes in GraphActivity
 
-        //TODO EXTRA GOAL: change to use android specific process to pick from calender and process as a date, same for duration
 
+        TimeModule newTimeModule = new TimeModule(duration, date, actTypeInput, isItProductive);
 
-        TimeModule newTimeModule = new TimeModule(duration, date, actTypeInput, isItProductive);    //TODO EXTRA GOAL: round to nearest 2 decimal places
+        //Insert the date into dates ArrayList. We have an extra ArrayList for date to avoid having to access a time modules date once it is already in an arraylist.
+        datesForSorting.add(Integer.parseInt(date));
 
+        Log.v("SORT", "dates arraylist: " + datesForSorting.toString());
+        Log.v("SORT", "dates to sort: " + Integer.parseInt(date));
+
+        //Find position to insert new time module
+        int keyDate = Integer.parseInt(date);
+        int insertionPosition = 0;
+
+        for (int i = 0; i < datesForSorting.size() - 1; i++) {
+            Log.v("SORT", "compare key: " + Integer.parseInt(date));
+            Log.v("SORT", "compare to array element: " + Integer.toString(datesForSorting.get(i)));
+            if (keyDate > datesForSorting.get(i)) {
+                insertionPosition++;
+            }
+        }
+        Log.v("SORT", "position to insert"+ Integer.toString(insertionPosition));
+
+        //Insert into correct position in respective array list.
         if (isItProductive) {
-            productiveTimeModulesArrayList.add(newTimeModule);
+            productiveTimeModulesArrayList.add(insertionPosition, newTimeModule);
             Log.v("STATUS", "added to productive list");
         } else if (!isItProductive) {
-            UNproductiveTimeModulesArrayList.add(newTimeModule);
+            UNproductiveTimeModulesArrayList.add(insertionPosition, newTimeModule);
             Log.v("STATUS", "added to UNproductive list");
         }
 
@@ -183,7 +202,6 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
     }
 
     // Method to store the data to internal device storage obtained from AddModuleFragment
-    //TODO check more but it may be the case that this is only saving per session on app not across sessions
     public void StoreModules() {
 
         //To get whether a module is productive or unproductive access global productivity status

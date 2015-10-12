@@ -36,10 +36,10 @@ public class GraphActivity extends AppCompatActivity {
         Viewport viewport = lineGraph.getViewport();
         viewport.setYAxisBoundsManual(true);
         viewport.setXAxisBoundsManual(true);
-        viewport.setMaxY(0);    //assume no negative times
+        viewport.setMinY(0);    //assume no negative times
         viewport.setMaxY(24);   //24 hours is max time. Reasoning: 24 hrs/day
-        viewport.setMaxX(0);    //assume no negative dates
-        viewport.setMaxX(20);   //for now display max 20 points -- consider changing addActivity to add to the front of list
+        viewport.setMinX(0);    //assume no negative dates
+        viewport.setMaxX(10);   //for now display max 10 points
         viewport.setScrollable(true);
 
         if (isItProductiveGraph) {
@@ -57,7 +57,7 @@ public class GraphActivity extends AppCompatActivity {
             while (amntOfPoints != 0) {
                 //Add point to graph
                 DataPoint point = new DataPoint(testXPos, extractedProdDurationData.get(yCoordArrayPosition));
-                series.appendData(point, true, 20);
+                series.appendData(point, true, 10);
 
                 Log.v("PRODPOINT", "added" + extractedProdDurationData.get(yCoordArrayPosition));
                 yCoordArrayPosition++;
@@ -234,7 +234,6 @@ public class GraphActivity extends AppCompatActivity {
                 }
 
                 //productiveDates.add(Integer.parseInt(dateEntryString));
-                //TODO add to list when bugs cleaned up
 
                 //Log.v("PRODDATECHECK", dateEntryString);
                 Log.v("PRODDATEARRAYLIST", productiveDates.toString());
