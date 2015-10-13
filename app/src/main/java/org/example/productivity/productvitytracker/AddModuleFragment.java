@@ -69,7 +69,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
     }
 
 
-    // askForInput() takes in user input and returns a TimeModule.
+    // askForInput() takes in user input and stores it in respective TimeModule array list.
     //TODO EXTRA: User can only enter realistic dates.
     public void askForInput() {
 
