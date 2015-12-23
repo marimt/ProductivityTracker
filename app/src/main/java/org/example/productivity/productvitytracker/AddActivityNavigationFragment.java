@@ -17,6 +17,8 @@ import android.widget.TextView;
 public class AddActivityNavigationFragment extends Fragment implements View.OnClickListener {
 
     View view;
+    // isProductive() is used to access global isProductive boolean variable to be store a TimeModule as
+    // productive or unproductive in AddModuleFragment
     public static boolean isProductive;
 
     //Needed UI components
@@ -54,21 +56,13 @@ public class AddActivityNavigationFragment extends Fragment implements View.OnCl
         switch (v.getId()) {
             case R.id.prodAddBtn:
                 isProductive = true;    //set global productivity status as true each time productive button is clicked
-                manager.beginTransaction().replace(R.id.main_act, addModFrag).addToBackStack("backFunctionality").commit();   //addToBackStack to work with overridden back button in main
                 break;
 
             case R.id.UNprodAddBtn:
                 isProductive = false;    //set global productivity status as false each time unproductive button is clicked
-                manager.beginTransaction().replace(R.id.main_act, addModFrag).addToBackStack("backFunctionality").commit();
                 break;
         }
+        manager.beginTransaction().replace(R.id.main_act, addModFrag).addToBackStack("backFunctionality").commit();   //addToBackStack to work with overridden back button in main
     }
-
-    // isProductive() is used to access global isProductive boolean variable to be store a TimeModule as
-    // productive or unproductive in AddModuleFragment
-    public static boolean isProductive() {
-        return isProductive;
-    }
-
 }
 

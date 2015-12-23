@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -73,7 +74,6 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
     //TODO EXTRA: User can only enter realistic dates.
     public void askForInput() {
 
-        final String LOG_TAG2 = "DISPLAY";
         final int minutesToHoursConversion = 60;
 
 
@@ -155,7 +155,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
 
         //To get whether a module is productive or unproductive access global productivity status
         AddActivityNavigationFragment productivityStatus = new AddActivityNavigationFragment();
-        boolean isItProductive = productivityStatus.isProductive();
+        boolean isItProductive = productivityStatus.isProductive; //.isProductive();
 
 
         //Process needed values for storing in a TimeModule
@@ -206,7 +206,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
 
         //To get whether a module is productive or unproductive access global productivity status
         AddActivityNavigationFragment productivityStatus = new AddActivityNavigationFragment();
-        boolean isItProductive = productivityStatus.isProductive();
+        boolean isItProductive = productivityStatus.isProductive;
 
         // Write to file
         try {
@@ -225,6 +225,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
                 fileOutputStream.close();
                 Log.v("SAVE", "saved UNproductive activity");
             }
+
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
