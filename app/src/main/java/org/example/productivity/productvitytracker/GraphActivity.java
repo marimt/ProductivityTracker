@@ -111,26 +111,26 @@ public class GraphActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // Method to access and read time modules from the device's internal storage
+    // Method to access and read productive time modules from the device's internal storage
     public String ReadModules(boolean productiveStatus) {
         String fileContents;
         String noFile = "no file was processed";
-        FileInputStream fileName;
 
         StringBuilder stringBuilder = new StringBuilder(); // used to read strings
 
         try {
-            // Read modules
-            if (productiveStatus = true)
-                fileName = openFileInput("productive_time_module_file");
+            // Read productive modules
+            FileInputStream fileInputStream;
+
+            if (productiveStatus)
+                fileInputStream = openFileInput("productive_time_module_file");
             else
-                fileName = openFileInput("UNproductive_time_module_file");
+                fileInputStream = openFileInput("UNproductive_time_module_file");
 
-            InputStreamReader inputStreamReader = new InputStreamReader(fileName);
-
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-            // First read file with time modules
+            // First read file with productive time modules
             while ((fileContents = bufferedReader.readLine()) != null) {
                 stringBuilder.append(fileContents + "\n");
                 Log.v("READ", "opened and read file");
