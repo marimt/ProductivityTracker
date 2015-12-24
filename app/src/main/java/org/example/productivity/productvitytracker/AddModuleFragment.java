@@ -21,6 +21,8 @@ import java.util.ArrayList;
 
 public class AddModuleFragment extends Fragment implements View.OnClickListener {
 
+    final String LOG_TAG = "ERRORS";
+
     View view;
     public final String prodfileName = "productive_time_module_file";
     public final String UNprodfileName = "UNproductive_time_module_file";
@@ -229,11 +231,13 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            Log.v("SAVE", "did not save, error file was not found");
-
+            Log.v(LOG_TAG, "did not save, error file was not found");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.v(LOG_TAG, "error did not save");
         } catch (Exception e) {
             e.printStackTrace();
-            Log.v("SAVE", "error did not save");
+            Log.v(LOG_TAG, "some other error occured");
         }
     }
 }

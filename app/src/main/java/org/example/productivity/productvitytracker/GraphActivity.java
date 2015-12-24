@@ -34,6 +34,8 @@ import java.util.ArrayList;
 
 public class GraphActivity extends AppCompatActivity {
 
+    final String LOG_TAG = "ERRORS";
+
     //Set max X and Y points to display. These can be changed according to how much data needs to be displayed.
     public final int maxXpoints = 10;  //for now display max 10 points for the X axis
     public final int maxYpoints =  24; //24 hours is max time and time is y axis. Reasoning: 24 hrs/day
@@ -141,8 +143,10 @@ public class GraphActivity extends AppCompatActivity {
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            Log.d(LOG_TAG, "File was not found");
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d(LOG_TAG, "There was an error reading the file");
         }
         return noFile;
     }
