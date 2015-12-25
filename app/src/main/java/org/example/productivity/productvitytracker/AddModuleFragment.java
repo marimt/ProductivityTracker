@@ -174,30 +174,18 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
         Log.v("SORT", "dates arraylist: " + datesForSorting.toString());
         Log.v("SORT", "dates to sort: " + Integer.parseInt(date));
 
-
+        //Find position to insert new time module
         int keyDate = Integer.parseInt(date);
-        int numOfElements = datesForSorting.size();
-        int lowerBound = 0;
-        int upperBound = numOfElements - 1;
+        int insertionPosition = 0;
 
-        int insertionPosition = BinarySearch(datesForSorting, lowerBound, upperBound, keyDate);
-
-        Log.v("INSERT", Integer.toString(insertionPosition));
-
-
-        /* out of date linear search for insertion point */
-//        //Find position to insert new time module
-//        int keyDate = Integer.parseInt(date);
-//        int insertionPosition = 0;
-//
-//        for (int i = 0; i < datesForSorting.size() - 1; i++) {
-//            Log.v("SORT", "compare key: " + Integer.parseInt(date));
-//            Log.v("SORT", "compare to array element: " + Integer.toString(datesForSorting.get(i)));
-//            if (keyDate > datesForSorting.get(i)) {
-//                insertionPosition++;
-//            }
-//        }
-//        Log.v("SORT", "position to insert"+ Integer.toString(insertionPosition));
+        for (int i = 0; i < datesForSorting.size() - 1; i++) {
+            Log.v("SORT", "compare key: " + Integer.parseInt(date));
+            Log.v("SORT", "compare to array element: " + Integer.toString(datesForSorting.get(i)));
+            if (keyDate > datesForSorting.get(i)) {
+                insertionPosition++;
+            }
+        }
+        Log.v("SORT", "position to insert"+ Integer.toString(insertionPosition));
 
         //Insert into correct position in respective array list.
         if (isItProductive) {
@@ -249,19 +237,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
             Log.v(LOG_TAG, "error did not save");
         } catch (Exception e) {
             e.printStackTrace();
-            Log.v(LOG_TAG, "some other error occurred");
+            Log.v(LOG_TAG, "some other error occured");
         }
-    }
-
-    private int BinarySearch (ArrayList<Integer> arrayList, int lowerBound, int upperBound, int keyDate) {
-        //Find the position to insert a new time module using binary search
-        int midBound = lowerBound + ( (upperBound - lowerBound) / 2 );
-
-        if (keyDate > datesForSorting.get(midBound))
-            return BinarySearch(arrayList, midBound + 1, upperBound, keyDate);
-        else if (keyDate < datesForSorting.get(midBound))
-            return BinarySearch(arrayList, lowerBound, midBound, keyDate);
-
-        return midBound;
     }
 }
