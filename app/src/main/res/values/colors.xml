@@ -4,6 +4,6 @@
     <color name="ColorPrimaryDark">#B71C1C</color>
     <color name="ColorPrimaryLight">#FF5252</color>
     <color name="ColorDisabled">#FF8A80</color>
-    <color name="ColorAccent">#FFC107</color>
+    <color name="ColorAccent">#FFFF00</color>  <!-- change back to #FFC107 when can edit Color.YELLOW in GraphView -->
 
 </resources>

@@ -1,13 +1,21 @@
 package org.example.productivity.productvitytracker;
 
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LabelFormatter;
 import com.jjoe64.graphview.Viewport;
+import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
@@ -37,8 +45,13 @@ public class GraphActivity extends AppCompatActivity {
     final String LOG_TAG = "ERRORS";
 
     //Set max X and Y points to display. These can be changed according to how much data needs to be displayed.
-    public final int maxXpoints = 10;  //for now display max 10 points for the X axis
-    public final int maxYpoints =  24; //24 hours is max time and time is y axis. Reasoning: 24 hrs/day
+    public final int maxXpoints = 4;  //for now display max 4 dates for the X axis
+    public final int maxYpoints = 24; //24 hours is max time and time is y axis. Reasoning: 24 hrs/day
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +60,15 @@ public class GraphActivity extends AppCompatActivity {
 
         GraphView lineGraph = (GraphView) findViewById(R.id.linegraph);
 
+        //Set titles and styles
+        lineGraph.getGridLabelRenderer().setHorizontalAxisTitleColor(Color.YELLOW);
+        lineGraph.getGridLabelRenderer().setNumHorizontalLabels(1);
+        lineGraph.getGridLabelRenderer().setVerticalAxisTitle("Time in Hours");
+        lineGraph.getGridLabelRenderer().setVerticalAxisTitleColor(Color.LTGRAY);
+
         //Get isProductiveGraph boolean status to use either productive or UNproductive methods
         ViewHistoryNavigationFragment viewHNFstatus = new ViewHistoryNavigationFragment();
         boolean productiveStatus = viewHNFstatus.isProductiveGraph;
-
 
         //Customize
         Viewport viewport = lineGraph.getViewport();
@@ -67,6 +85,25 @@ public class GraphActivity extends AppCompatActivity {
 
         extractedDurationData = ProcessDurationData();
         extractedDateData = ProcessDateData();
+
+
+        //Static number of Y labels for now (we will show max number)
+        String[] dateLabels = new String[maxYpoints];
+        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(lineGraph);
+        if (extractedDateData.size() >= 2) {    //setLabelFormatter needs at least 2 labels
+            // TODO: is not displaying date...bug
+            for (int i = 0; i < maxYpoints; i++) {
+                dateLabels[i] = Integer.toString(extractedDateData.get(i));
+            }
+            staticLabelsFormatter.setHorizontalLabels(dateLabels);
+        } else {
+            //placeholder
+            staticLabelsFormatter.setHorizontalLabels(new String[]{"Date 1", "Date 2", "Date 3", "Date 4"});
+        }
+        lineGraph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+        lineGraph.getGridLabelRenderer().setHorizontalLabelsColor(Color.YELLOW);
+        lineGraph.getGridLabelRenderer().setVerticalLabelsColor(Color.YELLOW);
+
 
         Log.v("CONTENTS", extractedDurationData.toString());
         int testXPos = 0;   //Will eventually move to ^ extractedProdDateData through adding a enum and/or insertion sort @ addModule
@@ -87,8 +124,13 @@ public class GraphActivity extends AppCompatActivity {
         }
 
         //draw graph when all points are added
+        series.setColor(Color.YELLOW);
+        series.setThickness(8);
         lineGraph.addSeries(series);
         Log.v("INFO", "read unproductive information");
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     @Override
@@ -225,4 +267,43 @@ public class GraphActivity extends AppCompatActivity {
         return activityDates;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Graph Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://org.example.productivity.productvitytracker/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Graph Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://org.example.productivity.productvitytracker/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
 }
