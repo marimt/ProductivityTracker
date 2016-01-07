@@ -60,7 +60,6 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
         return view;
     }
 
-
     @Override
     // OnClickListener cases
     public void onClick(View v) {
