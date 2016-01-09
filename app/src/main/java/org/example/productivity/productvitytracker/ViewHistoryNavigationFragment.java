@@ -71,7 +71,7 @@ public class ViewHistoryNavigationFragment extends Fragment implements View.OnCl
 
     // getGraphProdStatus() is used to access global isProductiveGraph boolean variable to communicate to GraphActivity whether user wants
     // ro see a productive or unproductive graph
-    public static boolean getGraphProdStatus() {
-        return isProductiveGraph;
-    }
+    //public static boolean getGraphProdStatus() {
+       // return isProductiveGraph;
+    //}
 }

@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -19,6 +20,8 @@ import java.util.ArrayList;
  */
 
 public class AddModuleFragment extends Fragment implements View.OnClickListener {
+
+    final String LOG_TAG = "ERRORS";
 
     View view;
     public final String prodfileName = "productive_time_module_file";
@@ -73,7 +76,6 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
     //TODO EXTRA: User can only enter realistic dates.
     public void askForInput() {
 
-        final String LOG_TAG2 = "DISPLAY";
         final int minutesToHoursConversion = 60;
 
 
@@ -155,7 +157,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
 
         //To get whether a module is productive or unproductive access global productivity status
         AddActivityNavigationFragment productivityStatus = new AddActivityNavigationFragment();
-        boolean isItProductive = productivityStatus.isProductive();
+        boolean isItProductive = productivityStatus.isProductive; //.isProductive();
 
 
         //Process needed values for storing in a TimeModule
@@ -172,18 +174,15 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
         Log.v("SORT", "dates arraylist: " + datesForSorting.toString());
         Log.v("SORT", "dates to sort: " + Integer.parseInt(date));
 
-        //Find position to insert new time module
+        //Find insertion position
         int keyDate = Integer.parseInt(date);
-        int insertionPosition = 0;
+        int numOfElements = datesForSorting.size();
+        int lowerBound = 0;
+        int upperBound = numOfElements;
 
-        for (int i = 0; i < datesForSorting.size() - 1; i++) {
-            Log.v("SORT", "compare key: " + Integer.parseInt(date));
-            Log.v("SORT", "compare to array element: " + Integer.toString(datesForSorting.get(i)));
-            if (keyDate > datesForSorting.get(i)) {
-                insertionPosition++;
-            }
-        }
-        Log.v("SORT", "position to insert"+ Integer.toString(insertionPosition));
+        int insertionPosition = BinarySearch(datesForSorting, lowerBound, upperBound, keyDate);
+        Log.v("INSERT", Integer.toString(insertionPosition));
+
 
         //Insert into correct position in respective array list.
         if (isItProductive) {
@@ -206,7 +205,7 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
 
         //To get whether a module is productive or unproductive access global productivity status
         AddActivityNavigationFragment productivityStatus = new AddActivityNavigationFragment();
-        boolean isItProductive = productivityStatus.isProductive();
+        boolean isItProductive = productivityStatus.isProductive;
 
         // Write to file
         try {
@@ -226,13 +225,33 @@ public class AddModuleFragment extends Fragment implements View.OnClickListener 
                 Log.v("SAVE", "saved UNproductive activity");
             }
 
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            Log.v("SAVE", "did not save, error file was not found");
-
+            Log.v(LOG_TAG, "did not save, error file was not found");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.v(LOG_TAG, "error did not save");
         } catch (Exception e) {
             e.printStackTrace();
-            Log.v("SAVE", "error did not save");
+            Log.v(LOG_TAG, "some other error occurred");
         }
+    }
+
+    //Find the position to insert a new time module using binary search
+    private int BinarySearch (ArrayList<Integer> arrayList, int lowerBound, int upperBound, int keyDate) {
+        int midBound;
+
+        if (lowerBound == upperBound)
+            return lowerBound;
+
+        midBound = lowerBound + ( (upperBound - lowerBound) / 2 );
+
+        if (keyDate > datesForSorting.get(midBound))
+            return BinarySearch(arrayList, midBound + 1, upperBound, keyDate);
+        else if (keyDate < datesForSorting.get(midBound))
+            return BinarySearch(arrayList, lowerBound, midBound, keyDate);
+
+        return midBound;
     }
 }

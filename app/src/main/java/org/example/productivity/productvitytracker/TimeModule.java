@@ -8,9 +8,9 @@ package org.example.productivity.productvitytracker;
 public class TimeModule {
 
     //Needed Variables
-    double duration;
-    String date, typeOfActivity;    //typeOfActivity e.g. homework, facebook, etc
-    boolean isProductive;
+    private double duration;
+    private String date, typeOfActivity;    //typeOfActivity e.g. homework, facebook, etc
+    private boolean isProductive;
 
 
     public TimeModule(double duration, String date, String typeOfActivity, boolean isProductive) {
