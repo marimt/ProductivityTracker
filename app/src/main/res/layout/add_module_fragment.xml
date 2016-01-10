@@ -92,6 +92,7 @@
                 android:ems="10"
                 android:id="@+id/editDurationMin"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="@color/ColorAccentEnabled"
                 android:gravity="center_horizontal"
                 android:layout_row="1"
                 android:layout_column="2"
@@ -133,6 +134,7 @@
                 android:layout_row="1"
                 android:layout_column="0"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="@color/ColorAccentEnabled"
                 android:gravity="center_horizontal"
                 android:hint="MM"
                 android:textColorHint="@color/ColorAccentDisabled"/>
@@ -157,6 +159,7 @@
                 android:layout_row="1"
                 android:layout_column="2"
                 android:hint="DD"
+                android:textColor="@color/ColorAccentEnabled"
                 android:textColorHint="@color/ColorAccentDisabled"/>
 
             <TextView
@@ -179,6 +182,7 @@
                 android:layout_row="1"
                 android:layout_column="4"
                 android:hint="YYYY"
+                android:textColor="@color/ColorAccentEnabled"
                 android:textColorHint="@color/ColorAccentDisabled"/>
 
             <TextView
