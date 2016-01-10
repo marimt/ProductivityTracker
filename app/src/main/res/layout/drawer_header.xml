@@ -5,25 +5,27 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="172dp"
-    android:background="@color/ColorPrimary"
-    android:paddingTop="25dp">
+    android:background="@drawable/red_geo_background">
 
-    <ImageView
-        android:id="@+id/avatar"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_margin="16dp"
-        android:elevation="4dp"
-        tools:src="@drawable/common_signin_btn_icon_pressed_dark"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
 
     <TextView
+        android:layout_above="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/email"
         android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="Username"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"/>
+        android:textColor="#ffffff"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:text="Mari M"
+        />
 
     <TextView
         android:id="@+id/email"
@@ -32,8 +34,18 @@
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="username@mail.com"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+        android:layout_marginTop="5dp"
+        android:textColor="#ffffff"
+        android:textSize="14sp"
+        android:text="name@mail.com"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"/>
+    </LinearLayout>
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/kuma_avatar"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="38dp"
+        android:id="@+id/avatarCircleView"/>
 </RelativeLayout>
