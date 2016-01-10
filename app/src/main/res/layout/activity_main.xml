@@ -15,9 +15,12 @@
         android:elevation="4dp"
         android:fitsSystemWindows="true">
 
+        <include
+            layout="@layout/tool_bar"></include>
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/FAB"
-            android:src="@drawable/mr_ic_settings_dark"
+            android:src="@mipmap/ic_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fabSize="normal"

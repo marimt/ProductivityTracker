@@ -1,6 +1,5 @@
 package org.example.productivity.productvitytracker;
 
-import android.app.ActionBar;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -8,11 +7,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.internal.view.menu.MenuView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 
@@ -36,12 +36,8 @@ public class MainActivity extends AppCompatActivity{
 
     private DrawerLayout drawerLayout;
     private FloatingActionButton mFAB;
-    private View.OnClickListener mFabClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Toast.makeText(getApplicationContext(), "FAB clicked", Toast.LENGTH_SHORT).show();
-        }
-    };
+    private NavigationView  navigationView;
+    private Toolbar toolbar;
 
 
     @Override
@@ -57,22 +53,13 @@ public class MainActivity extends AppCompatActivity{
         day = (EditText) findViewById(R.id.editDay);
         year = (EditText) findViewById(R.id.editYear);
         activityType = (EditText) findViewById(R.id.editActivityType);
-
-        //Test fab from support design library
         mFAB = (FloatingActionButton) findViewById(R.id.FAB);
-        mFAB.setOnClickListener(mFabClickListener);
-
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                menuItem.setChecked(true);
-                drawerLayout.closeDrawers();
-                return true;
-            }
-        });
+        navigationView = (NavigationView)findViewById(R.id.navigation_view);
+        toolbar = (Toolbar)findViewById(R.id.tool_bar);
 
+        //Declare toolbar to be the action bar
+        setSupportActionBar(toolbar);
 
         //Add default welcome layout. Will be switched for other layouts (add activity, history) depending on user behavior
         final WelcomeScreenFragment welcomeScreen = new WelcomeScreenFragment();
@@ -80,39 +67,10 @@ public class MainActivity extends AppCompatActivity{
         transaction2.add((R.id.main_act), welcomeScreen, "defaultWelcomeScrn");
         transaction2.commit();
 
-        //Makes ImageViews for icons
-        ImageView mainNavFAB = new ImageView(this);
-        ImageView addActFAB = new ImageView(this);
-        ImageView viewHistoryFAB = new ImageView(this);
-/*
-        //TODO get actual icons for these
-        //Assign icons for FAB buttons
-        mainNavFAB.setImageResource(R.drawable.circle);
-        addActFAB.setImageResource(R.drawable.circle);
-        viewHistoryFAB.setImageResource(R.drawable.circle);
-
-        //Make main floating action bar button (FAB button)
-        FloatingActionButton floatingActionButton = new FloatingActionButton.Builder(this).setContentView(mainNavFAB).build();
-
-        //Add SubAction that opens submenu which displays FAB sub-buttons after clicking mainNavFAB
-        SubActionButton.Builder itemBuilder = new SubActionButton.Builder(this);
-
-        //Create and add sub-buttons to submenu
-        final SubActionButton buttonAddActivity = itemBuilder.setContentView(addActFAB).build();
-        final SubActionButton buttonViewHistory = itemBuilder.setContentView(viewHistoryFAB).build();
-
-        //Create submenu for FAB sub-buttons
-        final FloatingActionMenu actionMenu = new FloatingActionMenu.Builder(this)
-                .addSubActionView(buttonAddActivity)   //sub-button
-                .addSubActionView(buttonViewHistory) //sub-button
-                .attachTo(floatingActionButton) //main button
-                .build();
-        //TODO the sub buttons don't close when user presses one. fix that.
-
         final AddActivityNavigationFragment addActivityNavigationFragment = new AddActivityNavigationFragment();
         //Set listeners for FAB sub-buttons
         //--------buttonAddActivity FAB sub-button------------------------------------------------------------
-        buttonAddActivity.setOnClickListener(new View.OnClickListener() {
+        mFAB.setOnClickListener(new View.OnClickListener() {
 
             FragmentTransaction transaction = manager.beginTransaction();
             FragmentTransaction transactionChange = manager.beginTransaction();
@@ -131,29 +89,21 @@ public class MainActivity extends AppCompatActivity{
                 }
 
                 //CASE 2 of buttonAddActivity button pressed while addActNav fragment is already visible
-                if (v == buttonAddActivity && addActivityNavigationFragment.isVisible()) {
+                if (v == mFAB && addActivityNavigationFragment.isVisible()) {
                     Toast.makeText(getApplicationContext(), "Please finish adding the current activity", Toast.LENGTH_SHORT).show();
                 }
-
-                //CASE 3 - buttonViewHistory is pressed and addActNav is visible
-                buttonViewHistory.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v2) {
-                        if (addActivityNavigationFragment.isVisible()) {
-                            transactionChange.replace(R.id.main_act, viewHist);
-                            transactionChange.commit();
-                        }
-                        //TODO known bug, having this fragment called twice will cause crash...maybe something about putting it back to stack?
-//                        // CASE 4 - of buttonViewHistory press - it is pressed while addActivityNavigationFragment is visible
-//                        if (v2 == buttonViewHistory && addActivityNavigationFragment.isVisible()){
-//                            Toast.makeText(getApplicationContext(), "testing back twice", Toast.LENGTH_SHORT).show();
-//                            transactionChange2.replace(R.id.main_act, viewHist);
-//                           transactionChange2.commit();
+//TODO: clicking on side panels (2 cases)
+                //CASE 3 - view history side panel is pressed and addActNav is visible
+//                buttonViewHistory.setOnClickListener(new View.OnClickListener() {
+//                    public void onClick(View v2) {
+//                        if (addActivityNavigationFragment.isVisible()) {
+//                            transactionChange.replace(R.id.main_act, viewHist);
+//                            transactionChange.commit();
 //                        }
-                    }
-                });
-
-                // CASE 5 - buttonAddActivity is pressed while viewHist fragment is visible
-                if (v == buttonAddActivity && viewHist.isVisible()) {
+//                    }
+//                });
+                 //CASE 4 - buttonAddActivity is pressed while viewHist fragment is visible
+                if (v == mFAB && viewHist.isVisible()) {
                     transactionChangeBack.replace(R.id.main_act, addActivityNavigationFragment);
                     transactionChangeBack.commit();
                 }
@@ -161,56 +111,66 @@ public class MainActivity extends AppCompatActivity{
         });
         //--------------------------------------------------------------------------------end buttonAddActivity FAB sub-button----
 
-
-        //--------buttonViewHistory FAB sub-button------------------------------------------------------------
-        buttonViewHistory.setOnClickListener(new View.OnClickListener() {
-            FragmentTransaction transaction = manager.beginTransaction();
-            FragmentTransaction transactionChange = manager.beginTransaction();
-            FragmentTransaction transactionChangeBack = manager.beginTransaction();
-//            FragmentTransaction transactionChange2 = manager.beginTransaction();
-            AddActivityNavigationFragment addActivityNavigationFragment = new AddActivityNavigationFragment();
-            ViewHistoryNavigationFragment viewHist = new ViewHistoryNavigationFragment();
-
+        //--------NaviigationDrawer actions pressed-------------------------------------------------------------------------------
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                //CASE 1 of buttonViewHistory button press - it has not been pressed before.
-                //Show ViewHistoryNavigationFragment
-                if (welcomeScreen.isVisible()) {   //setting the fragments only to be replaced under this condition stops it from mult overlay since add its only on startup
-                    transaction.replace(R.id.main_act, viewHist);  //use replace to prevent multiple overlay
-                    transaction.commit();
-                }
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
 
-                //CASE 2 - buttonAddActivity is pressed while viewHist is up
-                buttonAddActivity.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v2) {
-                        if (viewHist.isVisible()) {
-                            transactionChange.replace(R.id.main_act, addActivityNavigationFragment);
-                            transactionChange.commit();
-                        }
-                        // SIDE CASE - if addActNav button pressed while addActNav fragment is already up
-                        if (v2 == buttonAddActivity && addActivityNavigationFragment.isVisible()) {
-                                Toast.makeText(getApplicationContext(), "Please finish adding the current activity", Toast.LENGTH_SHORT).show();
-                        }
-                        //TODO final case where user has already switched framenets and wants to switch back - known bug
-//                        // CASE 4 - buttonAddActivity is pressed while viewHist is up
-//                        if (v2 == buttonAddActivity && viewHist.isVisible()) {
-//                            Toast.makeText(getApplicationContext(), "changeeee", Toast.LENGTH_SHORT).show();
-//                            //transactionChange2.replace(R.id.main_act, addActivityNavigationFragment);
-//                            //transactionChange2.commit();
-//                        }
-                    }
-                });
-
-                // CASE 3 - of buttonViewHistory press - it is pressed while addActivityNavigationFragment is up
-                if (v == buttonViewHistory && addActivityNavigationFragment.isVisible()){
-                    transactionChangeBack.replace(R.id.main_act, viewHist);
-                    transactionChangeBack.commit();
-                }
+                menuItem.setChecked(true);
+                Toast.makeText(getApplicationContext(), "Selected View Graph", Toast.LENGTH_SHORT).show();
+                drawerLayout.closeDrawers();
+                return true;
             }
         });
-        //--------------------------------------------------------------------------------end buttonViewActivity FAB sub-button----*/
-    }
 
+        //--------buttonViewHistory FAB sub-button------------------------------------------------------------
+//        buttonViewHistory.setOnClickListener(new View.OnClickListener() {
+//            FragmentTransaction transaction = manager.beginTransaction();
+//            FragmentTransaction transactionChange = manager.beginTransaction();
+//            FragmentTransaction transactionChangeBack = manager.beginTransaction();
+////            FragmentTransaction transactionChange2 = manager.beginTransaction();
+//            AddActivityNavigationFragment addActivityNavigationFragment = new AddActivityNavigationFragment();
+//            ViewHistoryNavigationFragment viewHist = new ViewHistoryNavigationFragment();
+//
+//            @Override
+//            public void onClick(View v) {
+//                //CASE 1 of buttonViewHistory button press - it has not been pressed before.
+//                //Show ViewHistoryNavigationFragment
+//                if (welcomeScreen.isVisible()) {   //setting the fragments only to be replaced under this condition stops it from mult overlay since add its only on startup
+//                    transaction.replace(R.id.main_act, viewHist);  //use replace to prevent multiple overlay
+//                    transaction.commit();
+//                }
+//
+//                //CASE 2 - buttonAddActivity is pressed while viewHist is up
+//                buttonAddActivity.setOnClickListener(new View.OnClickListener() {
+//                    public void onClick(View v2) {
+//                        if (viewHist.isVisible()) {
+//                            transactionChange.replace(R.id.main_act, addActivityNavigationFragment);
+//                            transactionChange.commit();
+//                        }
+//                        // SIDE CASE - if addActNav button pressed while addActNav fragment is already up
+//                        if (v2 == buttonAddActivity && addActivityNavigationFragment.isVisible()) {
+//                                Toast.makeText(getApplicationContext(), "Please finish adding the current activity", Toast.LENGTH_SHORT).show();
+//                        }
+//                        //TODO final case where user has already switched framenets and wants to switch back - known bug
+////                        // CASE 4 - buttonAddActivity is pressed while viewHist is up
+////                        if (v2 == buttonAddActivity && viewHist.isVisible()) {
+////                            Toast.makeText(getApplicationContext(), "changeeee", Toast.LENGTH_SHORT).show();
+////                            //transactionChange2.replace(R.id.main_act, addActivityNavigationFragment);
+////                            //transactionChange2.commit();
+////                        }
+//                    }
+//                });
+//
+//                // CASE 3 - of buttonViewHistory press - it is pressed while addActivityNavigationFragment is up
+//                if (v == buttonViewHistory && addActivityNavigationFragment.isVisible()){
+//                    transactionChangeBack.replace(R.id.main_act, viewHist);
+//                    transactionChangeBack.commit();
+//                }
+//            }
+//        });
+        //--------------------------------------------------------------------------------end buttonViewActivity FAB sub-button----
+    }
 
     @Override
     // Override this method to implement back button functionality for fragments
