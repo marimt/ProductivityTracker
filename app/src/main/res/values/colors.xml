@@ -5,5 +5,7 @@
     <color name="ColorPrimaryLight">#FF5252</color>
     <color name="ColorDisabled">#FF8A80</color>
     <color name="ColorAccent">#FFC107</color>
+    <color name="ColorAccentDisabled">#9e9e9e</color>
+    <color name="ColorAccentEnabled">#ff8f00</color>
 
 </resources>
