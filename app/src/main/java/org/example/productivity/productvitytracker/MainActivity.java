@@ -1,8 +1,12 @@
 package org.example.productivity.productvitytracker;
 
+import android.app.ActionBar;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,15 +15,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
-import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
-import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
-
 
 public class MainActivity extends AppCompatActivity{
 
     FragmentManager manager = getFragmentManager();
-    //Toolbar toolbar;
 
     //Needed UI components
     EditText hours, minutes, month, day, year, activityType;    //for AddModuleFragment
@@ -35,7 +34,14 @@ public class MainActivity extends AppCompatActivity{
     //=========================================================================================================================================
     //=========================================================================================================================================
 
-
+    private DrawerLayout drawerLayout;
+    private FloatingActionButton mFAB;
+    private View.OnClickListener mFabClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(getApplicationContext(), "FAB clicked", Toast.LENGTH_SHORT).show();
+        }
+    };
 
 
     @Override
@@ -52,8 +58,20 @@ public class MainActivity extends AppCompatActivity{
         year = (EditText) findViewById(R.id.editYear);
         activityType = (EditText) findViewById(R.id.editActivityType);
 
-        //TODO fix the toolbar
-        //toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //Test fab from support design library
+        mFAB = (FloatingActionButton) findViewById(R.id.FAB);
+        mFAB.setOnClickListener(mFabClickListener);
+
+        drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                menuItem.setChecked(true);
+                drawerLayout.closeDrawers();
+                return true;
+            }
+        });
 
 
         //Add default welcome layout. Will be switched for other layouts (add activity, history) depending on user behavior
@@ -62,12 +80,11 @@ public class MainActivity extends AppCompatActivity{
         transaction2.add((R.id.main_act), welcomeScreen, "defaultWelcomeScrn");
         transaction2.commit();
 
-
         //Makes ImageViews for icons
         ImageView mainNavFAB = new ImageView(this);
         ImageView addActFAB = new ImageView(this);
         ImageView viewHistoryFAB = new ImageView(this);
-
+/*
         //TODO get actual icons for these
         //Assign icons for FAB buttons
         mainNavFAB.setImageResource(R.drawable.circle);
@@ -191,7 +208,7 @@ public class MainActivity extends AppCompatActivity{
                 }
             }
         });
-        //--------------------------------------------------------------------------------end buttonViewActivity FAB sub-button----
+        //--------------------------------------------------------------------------------end buttonViewActivity FAB sub-button----*/
     }
 
 
