@@ -16,7 +16,6 @@ import android.widget.TextView;
  */
 public class WelcomeScreenFragment extends Fragment {
 
-
     View view;
     TextView homeWelcomeMssg;
 
